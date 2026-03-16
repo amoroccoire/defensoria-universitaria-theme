@@ -1,0 +1,55 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+
+@theme {
+    --font-sans: "Inter", sans-serif;
+}
+
+/* =====================
+   Animaciones del Hero
+   ===================== */
+@keyframes fade-in-up {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in-up {
+    animation: fade-in-up 0.5s ease-out 1s backwards;
+}
+
+@keyframes hero-carousel {
+
+    0%,
+    40% {
+        opacity: 0;
+        transform: scale(1);
+    }
+
+    60%,
+    100% {
+        opacity: 1;
+        transform: scale(1.02);
+    }
+}
+
+.animate-hero-carousel {
+    animation: hero-carousel 12s infinite alternate ease-in-out;
+}
+
+/* =====================
+   Tabs About Section
+   ===================== */
+.tab-btn.active {
+    color: #2563eb;
+    /* blue-600 */
+    border-bottom-color: #2563eb;
+}

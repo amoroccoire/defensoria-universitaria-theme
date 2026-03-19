@@ -102,6 +102,8 @@ if ($docs_query->have_posts()) {
             'year'     => get_field('documento_anio', $id) ?: get_the_date('Y'),
             'image'    => $imagen,
             'versions' => $versions_data,
+            'autor'    => get_field('documento_autor', $id) ?: '',
+            'tipo'     => strtoupper(get_field('documento_tipo', $id) ?: '')
         ];
     }
     wp_reset_postdata();
@@ -120,41 +122,60 @@ if ($docs_query->have_posts()) {
         </p>
 
         <!-- Buscador -->
-        <div class="max-w-2xl mx-auto mb-10 relative">
-            <input
-                type="text"
-                id="biblioteca-search"
-                placeholder="Buscar documentos por título..."
-                class="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none shadow-sm transition-shadow"
-            />
-            <svg class="w-6 h-6 text-gray-400 absolute left-4 top-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
+        <div class="flex items-center gap-2 max-w-2xl mx-auto mb-10">
+            <!-- Botón Filtros Mobile -->
+            <button id="btn-mobile-filtros" class="lg:hidden flex items-center gap-2 bg-transparent px-1 py-1 rounded-xs text-gray-700 font-medium hover:bg-gray-50 transition-colors whitespace-nowrap">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                </svg>
+            </button>
+            <div class="relative flex-grow">
+                <input
+                    type="text"
+                    id="biblioteca-search"
+                    placeholder="Buscar documentos por título..."
+                    class="w-full pl-12 pr-4 py-3 rounded-xs border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none shadow-sm transition-shadow"
+                />
+                <svg class="w-6 h-6 text-gray-400 absolute left-4 top-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+            </div>
         </div>
 
-        <div class="flex flex-col lg:flex-row gap-8">
+        <div class="flex flex-col lg:flex-row gap-8 items-start">
 
             <!-- Sidebar categorías -->
-            <aside class="w-full lg:w-64 flex-shrink-0">
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 sticky top-24">
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="font-bold text-gray-900">Categorías</h3>
+            <aside id="sidebar-filtros" class="fixed inset-y-0 left-0 z-[70] w-72 bg-white shadow-2xl transform -translate-x-full transition-transform duration-300 lg:relative lg:translate-x-0 lg:w-64 lg:shadow-none lg:bg-transparent lg:z-0 flex-shrink-0 overflow-y-auto h-full lg:h-auto overflow-x-hidden">
+                <div class="bg-white px-2 py-4 rounded-xs lg:shadow-sm lg:border lg:border-gray-200 lg:sticky lg:top-24 p-4 lg:p-0 min-h-full lg:min-h-0">
+                    
+                    <!-- Header Mobile Sidebar -->
+                    <div class="flex items-center justify-between mb-6 lg:hidden px-3 pt-2">
+                        <h3 class="font-bold text-gray-900 text-xl">Filtros</h3>
+                        <button id="btn-close-filtros" class="p-2 text-gray-400 hover:text-gray-900 bg-gray-100 hover:bg-gray-200 rounded-full transition-colors">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div class="flex justify-between items-center mb-4 py-4">
+                        <h3 class="font-bold px-3 text-gray-900">Categorías</h3>
                         <?php if ($cat_filter) : ?>
-                        <a href="<?php echo esc_url(get_permalink()); ?>" class="text-xs text-blue-600 hover:underline">Limpiar</a>
+                        <a href="<?php echo esc_url(get_permalink()); ?>" class="text-xs mr-3 text-blue-600 hover:underline">Limpiar</a>
                         <?php endif; ?>
                     </div>
                     <?php if (!empty($categorias) && !is_wp_error($categorias)) : ?>
                     <ul class="space-y-1">
                         <li>
                             <a href="<?php echo esc_url(remove_query_arg('categoria', get_permalink())); ?>"
-                                class="flex items-center justify-between text-sm py-1.5 px-2 rounded-lg transition-colors <?php echo !$cat_filter ? 'bg-blue-50 text-blue-700 font-semibold' : 'text-gray-600 hover:bg-gray-50'; ?>">
+                                class="flex items-center justify-between text-sm py-1.5 px-2 rounded-xs transition-colors <?php echo !$cat_filter ? 'bg-[#141F40] text-white font-semibold' : 'text-gray-600 hover:bg-gray-50'; ?>">
                                 <span>Todas</span>
                             </a>
                         </li>
                         <?php foreach ($categorias as $cat) : ?>
                         <li>
                             <a href="<?php echo esc_url(add_query_arg('categoria', $cat->slug, remove_query_arg('anio', get_permalink()))); ?>"
-                                class="flex items-center justify-between text-sm py-1.5 px-2 rounded-lg transition-colors <?php echo $cat_filter === $cat->slug ? 'bg-blue-50 text-blue-700 font-semibold' : 'text-gray-600 hover:bg-gray-50'; ?>">
+                                class="flex items-center justify-between text-sm py-1.5 px-2 rounded-xs transition-colors <?php echo $cat_filter === $cat->slug ? 'bg-[#141F40] text-white font-semibold' : 'text-gray-600 hover:bg-gray-50'; ?>">
                                 <span><?php echo esc_html($cat->name); ?></span>
                                 <span class="text-xs text-gray-400"><?php echo $cat->count; ?></span>
                             </a>
@@ -169,16 +190,16 @@ if ($docs_query->have_posts()) {
                     <?php if (!empty($years_available)) : ?>
                     <div class="mt-6 pt-6 border-t border-gray-100">
                         <div class="flex justify-between items-center mb-3">
-                            <h4 class="font-bold text-gray-900 text-sm">Año</h4>
+                            <h4 class="font-bold text-gray-900 text-sm px-3">Año</h4>
                             <?php if ($year_filter) : ?>
-                            <a href="<?php echo esc_url(remove_query_arg('anio', get_permalink())); ?>" class="text-xs text-blue-600 hover:underline">Limpiar</a>
+                            <a href="<?php echo esc_url(remove_query_arg('anio', get_permalink())); ?>" class="text-xs text-blue-600 mr-3 hover:underline">Limpiar</a>
                             <?php endif; ?>
                         </div>
                         <ul class="space-y-1">
                             <?php foreach ($years_available as $year) : ?>
                             <li>
                                 <a href="<?php echo esc_url(add_query_arg('anio', $year, remove_query_arg('paged', get_permalink()))); ?>"
-                                    class="flex items-center justify-between text-sm py-1.5 px-2 rounded-lg transition-colors <?php echo $year_filter === intval($year) ? 'bg-blue-50 text-blue-700 font-semibold' : 'text-gray-600 hover:bg-gray-50'; ?>">
+                                    class="flex items-center justify-between text-sm py-1.5 px-2 rounded-xs transition-colors <?php echo $year_filter === intval($year) ? 'bg-[#141F40] text-white font-semibold' : 'text-gray-600 hover:bg-gray-50'; ?>">
                                     <span><?php echo esc_html($year); ?></span>
                                 </a>
                             </li>
@@ -189,9 +210,9 @@ if ($docs_query->have_posts()) {
                 </div>
             </aside>
 
-            <!-- Grid de documentos -->
+            <!-- Lista de documentos estilo Google Search -->
             <div class="flex-grow">
-                <div id="biblioteca-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-10">
+                <div id="biblioteca-grid" class="flex flex-col divide-y divide-gray-100 mb-10">
                     <?php if ($docs_query->have_posts()) : ?>
                     <?php while ($docs_query->have_posts()) : $docs_query->the_post(); ?>
                     <?php
@@ -204,54 +225,84 @@ if ($docs_query->have_posts()) {
                         $total_vers = count($versiones);
                         $ver_actual = $total_vers > 0 ? $versiones[$total_vers - 1] : null;
                         $ver_numero = $ver_actual ? ($ver_actual['version_numero'] ?: 'v1.0.0') : '';
+                        $archivo_actual = $ver_actual ? $ver_actual['version_archivo'] : null;
+                        $url_actual = is_array($archivo_actual) ? $archivo_actual['url'] : ($archivo_actual ?: '#');
                         $tiene_hist = $total_vers > 1;
                         $anio       = get_field('documento_anio', $id) ?: get_the_date('Y');
+                        $autor      = get_field('documento_autor', $id) ?: '';
+                        $tipo       = strtoupper(get_field('documento_tipo', $id) ?: '');
                     ?>
-                    <div
-                        class="bg-white p-5 rounded-2xl shadow-sm border <?php echo $tiene_hist ? 'border-blue-200 ring-1 ring-blue-100/50' : 'border-gray-100'; ?> hover:shadow-md transition-all group flex flex-col cursor-pointer"
-                        onclick="openDocPanel(<?php echo $id; ?>)"
-                    >
-                        <?php if ($imagen) : ?>
-                        <div class="h-36 bg-gray-100 rounded-lg mb-4 overflow-hidden">
-                            <img src="<?php echo esc_url($imagen); ?>" alt="<?php echo esc_attr(get_the_title()); ?>"
-                                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                        </div>
-                        <?php endif; ?>
-
-                        <div class="flex justify-between items-start mb-3">
-                            <?php if ($cat_name) : ?>
-                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold border <?php echo esc_attr($cat_clase); ?>">
-                                <?php echo esc_html($cat_name); ?>
-                            </span>
+                    <div class="flex items-start gap-10 py-5 group hover:bg-gray-50/60 rounded-xl px-3 -mx-3 transition-colors relative">
+                        <!-- Miniatura izquierda -->
+                        <a href="<?php echo esc_url($url_actual); ?>" target="_blank" class="hidden sm:block flex-shrink-0 w-20 h-20 rounded-xs overflow-hidden bg-gray-100 border border-gray-200 hover:opacity-90 transition-opacity flex items-center justify-center">
+                            <?php if ($imagen) : ?>
+                            <img
+                                src="<?php echo esc_url($imagen); ?>"
+                                alt="<?php echo esc_attr(get_the_title()); ?>"
+                                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            />
                             <?php else : ?>
-                            <span></span>
-                            <?php endif; ?>
-                            <?php if ($ver_numero) : ?>
-                            <span class="text-xs font-bold px-2 py-1 rounded-md <?php echo $tiene_hist ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700'; ?>">
-                                <?php echo esc_html($ver_numero); ?>
-                            </span>
-                            <?php endif; ?>
-                        </div>
-
-                        <h4 class="font-bold text-gray-900 mb-2 leading-snug group-hover:text-blue-600 transition-colors line-clamp-2">
-                            <?php the_title(); ?>
-                        </h4>
-
-                        <p class="text-sm text-gray-500 mt-auto flex items-center justify-between border-t border-gray-50 pt-3">
-                            <span class="flex items-center gap-1">
-                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                            <div class="w-full h-full flex items-center justify-center">
+                                <svg class="w-8 h-8 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                 </svg>
-                                <?php echo esc_html($anio); ?>
-                            </span>
-                            <span class="font-medium text-xs bg-gray-100 px-2 py-1 rounded-full text-gray-600">
-                                <?php echo $total_vers; ?> versión<?php echo $total_vers !== 1 ? 'es' : ''; ?>
-                            </span>
-                        </p>
+                            </div>
+                            <?php endif; ?>
+                        </a>
+
+                        <!-- Contenido derecha -->
+                        <div class="flex-grow min-w-0">
+
+                            <!-- Breadcrumb estilo Google -->
+                            <div class="flex items-center gap-1.5 text-xs text-gray-500 mb-1 flex-wrap">
+                                <span class="text-green-700 font-medium">biblioteca</span>
+                                <?php if ($cat_name) : ?>
+                                <span>›</span>
+                                <span><?php echo esc_html($cat_name); ?></span>
+                                <?php endif; ?>
+                                <?php if ($anio) : ?>
+                                <span>›</span>
+                                <span><?php echo esc_html($anio); ?></span>
+                                <?php endif; ?>
+                            </div>
+
+                            <!-- Título estilo resultado de búsqueda -->
+                            <a href="<?php echo esc_url($url_actual); ?>" target="_blank" class="block w-fit">
+                                <h4 class="js-search-title text-lg font-medium text-blue-700 hover:underline leading-snug mb-1 line-clamp-3">
+                                    <?php the_title(); ?>
+                                </h4>
+                            </a>
+
+                            <!-- Meta info -->
+                            <div class="inline-flex items-center gap-2 flex-wrap mb-1.5 cursor-pointer hover:scale-[1.02] transition-transform origin-left" onclick="openDocPanel(<?php echo $id; ?>)" title="Ver historial de versiones">
+                                <?php if ($tipo) : ?>
+                                <span class="text-xs font-bold px-1.5 py-0.5 rounded-xs bg-gray-100 text-gray-600 border border-gray-200">
+                                    <?php echo esc_html($tipo); ?>
+                                </span>
+                                <?php endif; ?>
+                                <?php if ($ver_numero) : ?>
+                                <span class="text-xs font-semibold px-1.5 py-0.5 rounded-xs <?php echo $tiene_hist ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600'; ?>">
+                                    <?php echo esc_html($ver_numero); ?>
+                                </span>
+                                <?php endif; ?>
+                                <?php if ($tiene_hist) : ?>
+                                <span class="text-xs text-blue-500">
+                                    <?php echo $total_vers; ?> versiones disponibles
+                                </span>
+                                <?php endif; ?>
+                            </div>
+
+                            <!-- Descripción estilo snippet -->
+                            <p class="text-sm text-gray-600 line-clamp-2 leading-relaxed">
+                                <?php if ($autor) echo esc_html($autor) . ' · '; ?>
+                                <?php echo esc_html(wp_trim_words(get_the_excerpt() ?: get_post_field('post_content', $id), 18, '...')); ?>
+                            </p>
+
+                        </div>
                     </div>
                     <?php endwhile; wp_reset_postdata(); ?>
                     <?php else : ?>
-                    <div class="col-span-3 text-center py-20">
+                    <div class="text-center py-20">
                         <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
@@ -267,21 +318,21 @@ if ($docs_query->have_posts()) {
                 ?>
                 <div class="flex justify-center items-center space-x-2">
                     <?php if ($paged > 1) : ?>
-                    <a href="<?php echo get_pagenum_link($paged - 1); ?>" class="inline-flex items-center justify-center w-10 h-10 rounded-lg border border-gray-300 text-gray-500 hover:bg-white hover:text-gray-700 transition-colors shadow-sm">
+                    <a href="<?php echo get_pagenum_link($paged - 1); ?>" class="inline-flex items-center justify-center w-5 h-5 rounded-xs text-gray-500 hover:bg-white hover:text-gray-700 transition-colors">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
                     </a>
                     <?php endif; ?>
                     <?php for ($i = 1; $i <= $total_pages; $i++) : ?>
                         <?php if ($i === $paged) : ?>
-                        <span class="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-blue-600 text-white font-medium shadow-sm"><?php echo $i; ?></span>
+                        <span class="inline-flex items-center justify-center w-10 h-10 rounded-xs bg-blue-600 text-white font-medium shadow-sm"><?php echo $i; ?></span>
                         <?php elseif ($i === 1 || $i === $total_pages || abs($i - $paged) <= 1) : ?>
-                        <a href="<?php echo get_pagenum_link($i); ?>" class="inline-flex items-center justify-center w-10 h-10 rounded-lg border border-gray-300 bg-white text-gray-700 hover:text-blue-600 transition-colors shadow-sm font-medium"><?php echo $i; ?></a>
+                        <a href="<?php echo get_pagenum_link($i); ?>" class="inline-flex items-center justify-center w-10 h-10 rounded-xs border border-gray-300 bg-white text-gray-700 hover:text-blue-600 transition-colors shadow-sm font-medium"><?php echo $i; ?></a>
                         <?php elseif (abs($i - $paged) === 2) : ?>
                         <span class="inline-flex items-center justify-center w-10 h-10 text-gray-500">...</span>
                         <?php endif; ?>
                     <?php endfor; ?>
                     <?php if ($paged < $total_pages) : ?>
-                    <a href="<?php echo get_pagenum_link($paged + 1); ?>" class="inline-flex items-center justify-center w-10 h-10 rounded-lg border border-gray-300 text-gray-500 hover:bg-white hover:text-gray-700 transition-colors shadow-sm">
+                    <a href="<?php echo get_pagenum_link($paged + 1); ?>" class="inline-flex items-center justify-center w-5 h-5 rounded-xs text-gray-500 hover:bg-white hover:text-gray-700 transition-colors">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                     </a>
                     <?php endif; ?>
@@ -293,14 +344,14 @@ if ($docs_query->have_posts()) {
 </section>
 
 <!-- ===================== -->
-<!-- SLIDE PANEL           -->
+<!-- MODAL PANEL           -->
 <!-- ===================== -->
-<div id="doc-slide-panel" class="fixed inset-y-0 right-0 w-full md:w-[450px] bg-white shadow-2xl transform translate-x-full transition-transform duration-300 z-[60] border-l border-gray-200 flex flex-col">
-
-    <!-- Header del panel -->
+<div id="doc-slide-panel" class="fixed inset-0 z-[60] flex items-center justify-center p-4 sm:p-6 opacity-0 pointer-events-none transition-opacity duration-300">
+    <div id="doc-modal-content" class="bg-white rounded-xs shadow-2xl w-full max-w-2xl max-h-[95vh] flex flex-col overflow-hidden transform scale-95 transition-transform duration-300">
+        <!-- Header del panel -->
     <div class="p-6 border-b border-gray-100 flex justify-between items-start bg-gray-50/50 flex-shrink-0">
         <div class="pr-4">
-            <span id="panel-category" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold border mb-3 bg-gray-100 text-gray-700 border-gray-200"></span>
+            <span id="panel-category" class="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold border mb-3 bg-gray-100 text-gray-700 border-gray-200"></span>
             <h2 id="panel-title" class="text-xl font-bold text-gray-900 leading-tight"></h2>
             <p id="panel-year" class="text-sm text-gray-500 mt-2 flex items-center gap-1">
                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -322,20 +373,21 @@ if ($docs_query->have_posts()) {
         <!-- Versión actual -->
         <div class="mb-8">
             <h3 class="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4 flex items-center gap-2">
-                <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                <span class="w-2 h-2 rounded-full bg-[#141F40]"></span>
                 Versión Actual
             </h3>
-            <div id="panel-current-version" class="bg-gray-50 border border-gray-200 rounded-xl p-5 shadow-sm">
-                <div class="flex justify-between items-start mb-3">
-                    <span id="panel-ver-numero" class="bg-gray-900 text-white px-2.5 py-1 rounded text-sm font-bold"></span>
-                    <span class="bg-green-100 text-green-800 text-xs font-semibold px-2 py-1 rounded-full border border-green-200">Vigente</span>
+            <div id="panel-current-version" class="flex flex-row p-3">
+                <div class="flex flex-col mr-3">
+                    <div class="flex justify-center items-center mb-3">
+                        <span id="panel-ver-numero" class="bg-[#141F40] text-white px-2.5 py-1 rounded-xs text-sm font-bold"></span>
+                    </div>
+                    <p id="panel-ver-fecha" class="text-xs text-gray-500 mb-2"></p>
                 </div>
-                <p id="panel-ver-fecha" class="text-xs text-gray-500 mb-2"></p>
                 <p id="panel-ver-notas" class="text-sm text-gray-700"></p>
             </div>
             <div class="mt-4">
                 <a id="panel-download-btn" href="#" download target="_blank"
-                    class="flex items-center justify-center gap-2 w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-colors shadow-sm">
+                    class="flex items-center justify-center gap-2 w-full bg-[#141F40] hover:bg-[#041d68] text-white px-4 py-2.5 rounded-xs text-sm font-medium transition-colors shadow-sm">
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
                     </svg>
@@ -356,14 +408,24 @@ if ($docs_query->have_posts()) {
         </div>
 
     </div>
+    </div>
 </div>
 
-<!-- Backdrop -->
+<!-- Backdrop Documentos -->
 <div id="doc-backdrop" class="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 hidden opacity-0 transition-opacity"></div>
+
+<!-- Backdrop Sidebar Mobile -->
+<div id="sidebar-backdrop" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[65] hidden opacity-0 transition-opacity lg:hidden"></div>
 
 <!-- Datos para el módulo biblioteca.js -->
 <script>
 window.BIBLIOTECA_DOCS = <?php echo json_encode($docs_js, JSON_UNESCAPED_UNICODE); ?>;
+window.BIBLIOTECA_AJAX_URL = "<?php echo admin_url('admin-ajax.php'); ?>";
+window.BIBLIOTECA_NONCE = "<?php echo wp_create_nonce('load_more_docs_nonce'); ?>";
+window.BIBLIOTECA_CURRENT_PAGE = <?php echo $paged; ?>;
+window.BIBLIOTECA_MAX_PAGES = <?php echo $docs_query->max_num_pages; ?>;
+window.BIBLIOTECA_CAT_FILTER = "<?php echo esc_js($cat_filter); ?>";
+window.BIBLIOTECA_YEAR_FILTER = <?php echo intval($year_filter); ?>;
 window.CAT_COLORES = {
     'Boletines':       'bg-blue-100 text-blue-700 border-blue-200',
     'Informes':        'bg-purple-100 text-purple-700 border-purple-200',

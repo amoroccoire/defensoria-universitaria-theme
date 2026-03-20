@@ -45,9 +45,7 @@ require_once get_template_directory() . '/includes/contact-data.php';
                     <div>
                         <h4 class="font-bold text-gray-900 text-lg">Teléfono</h4>
                         <p class="text-gray-600">
-                            <a href="tel:<?php echo esc_attr(preg_replace('/\s+/', '', $contact_phone)); ?>" class="hover:text-blue-600 transition-colors">
-                                <?php echo esc_html($contact_phone); ?>
-                            </a>
+                            <?php echo esc_html($contact_phone); ?>
                         </p>
                     </div>
                 </div>
@@ -62,9 +60,7 @@ require_once get_template_directory() . '/includes/contact-data.php';
                     <div>
                         <h4 class="font-bold text-gray-900 text-lg">Email</h4>
                         <p class="text-gray-600">
-                            <a href="mailto:<?php echo esc_attr($contact_email); ?>" class="hover:text-blue-600 transition-colors">
-                                <?php echo esc_html($contact_email); ?>
-                            </a>
+                            <?php echo esc_html($contact_email); ?>
                         </p>
                     </div>
                 </div>

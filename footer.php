@@ -1,3 +1,12 @@
+<?php
+/**
+ * Footer — datos sincronizados con contact-data.php
+ */
+
+include get_template_directory() . '/includes/contact-data.php';
+global $contact_address, $contact_phone, $contact_email, $contact_hours, $social_links, $social_icons;
+?>
+
 <footer class="bg-gray-900 text-gray-300 py-12 border-t border-gray-800">
     <div class="container mx-auto px-4 max-w-7xl">
 
@@ -21,13 +30,13 @@
                         <span class="text-xs text-gray-400 font-medium tracking-wide">UNSA</span>
                     </div>
                 </div>
-                <p class="text-sm leading-relaxed mb-6 text-gray-400">
+                <p class="text-sm leading-relaxed text-gray-400">
                     La Defensoría Universitaria es el órgano encargado de la tutela de los derechos
                     de los miembros de la comunidad universitaria.
                 </p>
             </div>
 
-            <!-- Columna 2: Enlaces rápidos desde el menú de WordPress -->
+            <!-- Columna 2: Enlaces rápidos -->
             <div class="lg:pl-10">
                 <h3 class="text-white font-bold text-lg mb-6 relative inline-block">
                     Enlaces rápidos
@@ -46,43 +55,75 @@
                 </ul>
             </div>
 
-            <!-- Columna 3: Contacto -->
+            <!-- Columna 3: Contacto sincronizado -->
             <div>
                 <h3 class="text-white font-bold text-lg mb-6 relative inline-block">
                     Contacto
                     <span class="absolute -bottom-2 left-0 w-10 h-1 bg-blue-600 rounded-full"></span>
                 </h3>
                 <ul class="space-y-4 text-sm mt-2">
-                    <li class="flex items-start">
-                        <svg class="w-5 h-5 text-white mr-3 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+
+                    <!-- Dirección -->
+                    <li class="flex items-start gap-3">
+                        <svg class="w-5 h-5 text-white mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                         </svg>
-                        <span>Av. Virgen del Pilar s/n, Área de Sociales de la UNSA.<br />Referencia: al costado del Comedor Universitario</span>
+                        <span><?php echo nl2br(esc_html($contact_address)); ?></span>
                     </li>
-                    <li class="flex items-center">
-                        <svg class="w-5 h-5 text-white mr-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+
+                    <!-- Teléfono -->
+                    <li class="flex items-center gap-3">
+                        <svg class="w-5 h-5 text-white flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                         </svg>
-                        <span>(054) 391911</span>
+                        <a href="tel:<?php echo esc_attr(preg_replace('/\s+/', '', $contact_phone)); ?>" class="hover:text-white transition-colors">
+                            <?php echo esc_html($contact_phone); ?>
+                        </a>
                     </li>
-                    <li class="flex items-center">
-                        <svg class="w-5 h-5 text-white mr-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+
+                    <!-- Email -->
+                    <li class="flex items-center gap-3">
+                        <svg class="w-5 h-5 text-white flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                         </svg>
-                        <span>defensoria@unsa.edu.pe</span>
+                        <a href="mailto:<?php echo esc_attr($contact_email); ?>" class="hover:text-white transition-colors">
+                            <?php echo esc_html($contact_email); ?>
+                        </a>
                     </li>
+
+                    <!-- Horario -->
+                    <li class="flex items-center gap-3">
+                        <svg class="w-5 h-5 text-white flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span><?php echo esc_html($contact_hours); ?></span>
+                    </li>
+
                 </ul>
 
-                <div class="mt-8 flex space-x-4">
-                    <a href="https://www.facebook.com/DefUnsa/" target="_blank" rel="noopener noreferrer"
-                        class="text-gray-400 hover:text-white transition-colors transform hover:scale-110">
-                        <span class="sr-only">Facebook</span>
-                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+                <!-- Redes sociales sincronizadas -->
+                <?php if (!empty($social_links)) : ?>
+                <div class="mt-6 flex items-center gap-3">
+                    <?php foreach ($social_links as $red => $url) :
+                        if (!isset($social_icons[$red])) continue;
+                        $icon = $social_icons[$red];
+                    ?>
+                    <a
+                        href="<?php echo esc_url($url); ?>"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="w-9 h-9 rounded-full bg-white flex items-center justify-center hover:opacity-80 transition-opacity"
+                        title="<?php echo esc_attr($icon['label']); ?>"
+                    >
+                        <span class="sr-only"><?php echo esc_html($icon['label']); ?></span>
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <?php echo $icon['svg']; ?>
                         </svg>
                     </a>
+                    <?php endforeach; ?>
                 </div>
+                <?php endif; ?>
             </div>
 
         </div>
@@ -96,9 +137,6 @@
 </footer>
 
 <?php
-/**
- * Fallback footer: si no hay menú footer asignado muestra links básicos
- */
 function defensoria_footer_fallback() {
     $links = [
         'Inicio'    => home_url('/'),
@@ -109,11 +147,11 @@ function defensoria_footer_fallback() {
         'Noticias'  => home_url('/noticias'),
         'Contacto'  => home_url('/#contact'),
     ];
-    foreach ( $links as $name => $url ) {
+    foreach ($links as $name => $url) {
         printf(
             '<li><a href="%s" class="hover:text-blue-400 transition-colors flex items-center group"><svg class="w-3 h-3 mr-2 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>%s</a></li>',
-            esc_url( $url ),
-            esc_html( $name )
+            esc_url($url),
+            esc_html($name)
         );
     }
 }

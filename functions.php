@@ -127,7 +127,7 @@ function defensoria_register_post_types() {
         'show_in_menu'  => true,
         'menu_icon'     => 'dashicons-groups',
         'menu_position' => 8,
-        'supports'      => ['title', 'editor', 'thumbnail'],
+        'supports'      => ['title', 'thumbnail'],
         'has_archive'   => false,
         'rewrite'       => ['slug' => 'equipo'],
         'show_in_rest'  => false,

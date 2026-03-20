@@ -1,6 +1,5 @@
 // =============================================
 // Módulo: Hero
-// Cerrar banner flotante de eventos
 // =============================================
 
 const closeEventBanner = document.getElementById('close-event-banner');

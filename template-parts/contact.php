@@ -1,19 +1,9 @@
 <?php
 /**
  * Template Part: Sección Contacto
- * Campos ACF: contact_intro, contact_address, contact_phone,
- *             contact_email, contact_hours, contact_facebook, contact_map_url
  */
 
-$home_id = get_option('page_on_front');
-
-$contact_intro    = get_field('contact_intro',    $home_id) ?: 'Estamos aquí para escucharte. Puedes visitarnos en nuestras oficinas, llamarnos o enviarnos un mensaje a través del formulario.';
-$contact_address  = get_field('contact_address',  $home_id) ?: 'Av. Virgen del Pilar s/n, Área de Sociales de la UNSA. Referencia: al costado del Comedor Universitario';
-$contact_phone    = get_field('contact_phone',    $home_id) ?: '+51 932 907 594';
-$contact_email    = get_field('contact_email',    $home_id) ?: 'defensoria@unsa.edu.pe';
-$contact_hours    = get_field('contact_hours',    $home_id) ?: 'Lunes a Viernes: 8:30 AM - 3:40 PM';
-$contact_facebook = get_field('contact_facebook', $home_id) ?: 'https://www.facebook.com/DefUnsa/';
-$contact_map_url  = get_field('contact_map_url',  $home_id) ?: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d956.8418514942298!2d-71.52196753434885!3d-16.40615648432324!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x91424b4ab43c09f1%3A0x76543ca3cba745d!2sDefensoria%20Universitaria%20-%20UNSA!5e0!3m2!1ses!2spe!4v1771854708866!5m2!1ses!2spe';
+require_once get_template_directory() . '/includes/contact-data.php';
 ?>
 
 <section id="contact" class="py-20 bg-gray-50">
@@ -93,24 +83,34 @@ $contact_map_url  = get_field('contact_map_url',  $home_id) ?: 'https://www.goog
                 </div>
 
                 <!-- Redes sociales -->
-                <?php if ($contact_facebook) : ?>
-                <div class="pt-6">
+                <?php if (!empty($social_links)) : ?>
+                <div class="pt-2">
                     <h4 class="font-bold text-gray-900 mb-4">Síguenos</h4>
-                    <div class="flex space-x-4">
-                        <a href="<?php echo esc_url($contact_facebook); ?>" target="_blank" rel="noopener noreferrer"
-                            class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center hover:bg-blue-700 transition-colors">
-                            <span class="sr-only">Facebook</span>
-                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+                    <div class="flex items-center gap-3">
+                        <?php foreach ($social_links as $red => $url) :
+                            if (!isset($social_icons[$red])) continue;
+                            $icon = $social_icons[$red];
+                        ?>
+                        <a
+                            href="<?php echo esc_url($url); ?>"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="w-10 h-10 rounded-full bg-white border border-gray-200 flex items-center justify-center hover:border-[#141F40] hover:shadow-md transition-all"
+                            title="<?php echo esc_attr($icon['label']); ?>"
+                        >
+                            <span class="sr-only"><?php echo esc_html($icon['label']); ?></span>
+                            <svg class="w-5 h-5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <?php echo $icon['svg']; ?>
                             </svg>
                         </a>
+                        <?php endforeach; ?>
                     </div>
                 </div>
                 <?php endif; ?>
             </div>
 
-            <!-- Columna del mapa embebido -->
-            <div class="bg-gray-200 rounded-sm shadow-xl overflow-hidden border border-gray-100 min-h-[400px] w-full h-full lg:h-auto">
+            <!-- Columna del mapa -->
+            <div class="bg-gray-200 rounded-sm shadow-xl overflow-hidden border border-gray-100 min-h-[400px]">
                 <?php if ($contact_map_url) : ?>
                 <iframe
                     src="<?php echo esc_url($contact_map_url); ?>"
@@ -133,6 +133,5 @@ $contact_map_url  = get_field('contact_map_url',  $home_id) ?: 'https://www.goog
             </div>
 
         </div>
-
     </div>
 </section>

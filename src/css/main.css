@@ -7,6 +7,7 @@
     --font-sans: "Inter", sans-serif;
 }
 
+
 /* =====================
    Animaciones del Hero
    ===================== */
@@ -48,8 +49,89 @@
 /* =====================
    Tabs About Section
    ===================== */
-.tab-btn.active {
+.tab-btn {
+    position: relative;
+}
+
+/* Texto activo */
+.tab-btn.active>span:first-child {
     color: #2563eb;
     /* blue-600 */
-    border-bottom-color: #2563eb;
+}
+
+/* Indicador inferior animado */
+.tab-btn>span:last-child {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 3px;
+    background-color: #2563eb;
+    border-radius: 9999px;
+    transition: width 0.3s ease;
+}
+
+.tab-btn.active>span:last-child {
+    width: 100%;
+}
+
+/* Ocultar tabs inactivos */
+.tab-content {
+    display: block;
+}
+
+.tab-content.hidden {
+    display: none;
+}
+
+/* =====================
+   Animación Reveal (Team)
+   ===================== */
+.reveal-item {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.reveal-item.revealed {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* =====================
+   Tabs About Section
+   ===================== */
+.tab-btn {
+    position: relative;
+}
+
+/* Texto activo */
+.tab-btn.active>span:first-child {
+    color: #2563eb;
+    /* blue-600 */
+}
+
+/* Indicador inferior animado */
+.tab-btn>span:last-child {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 3px;
+    background-color: #2563eb;
+    border-radius: 9999px;
+    transition: width 0.3s ease;
+}
+
+.tab-btn.active>span:last-child {
+    width: 100%;
+}
+
+/* Ocultar tabs inactivos */
+.tab-content {
+    display: block;
+}
+
+.tab-content.hidden {
+    display: none;
 }

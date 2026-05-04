@@ -73,10 +73,22 @@ $services = [
                         <?php echo wp_kses_post($services[1]['extra_content']); ?>
                     </p>
                 <?php endif; ?>
-                <a href="<?php echo home_url('/#contact'); ?>"
-                    class="w-full block text-center bg-[#b90615] hover:bg-[#8C0712] text-white font-medium py-3 px-6 rounded-sm transition-colors shadow-md hover:shadow-lg">
-                    Presentar queja
-                </a>
+                <?php 
+        
+                $show_button = get_theme_mod('hero_show_btn', true);
+                $btn_text    = get_theme_mod('hero_btn_text', 'Presentar una queja');
+
+                if ( $show_button && !empty($btn_text) ) : 
+                ?>
+                    
+                    <a href="<?php echo home_url('/#contact'); ?>" 
+                        class="w-full block text-center bg-[#b90615] hover:bg-[#8C0712] text-white font-medium py-3 px-6 rounded-sm transition-colors shadow-md hover:shadow-lg">
+                        <?php echo esc_html($btn_text); ?>
+                    </a>
+                    
+                <?php endif; ?>
+
+                
                 <p class="text-center text-xs text-gray-500 mt-3 flex items-center justify-center gap-1">
                     <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />

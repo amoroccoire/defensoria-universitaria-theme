@@ -2,7 +2,6 @@
 /**
  * Template: Vista individual de una Noticia
  * Archivo: single-noticia.php
- * Estilo: artículo tipo Medium
  */
 
 get_header();

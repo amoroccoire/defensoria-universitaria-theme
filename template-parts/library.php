@@ -115,7 +115,7 @@ if ($docs_query->have_posts()) {
     <div class="container mx-auto px-4 max-w-7xl">
 
         <h2 class="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-4">
-            Biblioteca Virtual
+            Documentos
         </h2>
         <p class="text-center text-gray-500 mb-12">
             Documentos, reglamentos e informes de la Defensoría Universitaria

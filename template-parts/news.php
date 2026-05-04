@@ -24,15 +24,21 @@ $eventos_query = new WP_Query([
     'meta_key'       => 'evento_fecha',
     'order'          => 'ASC',
 ]);
+
+$titulo_noticias = get_field('noticia_title') ?: 'Noticias y eventos';
+$desc_noticias   = get_field('noticia_description') ?: 'Mantente informado sobre las actividades de la Defensoría Universitaria';
+
+$titulo_eventos  = get_field('eventos_title') ?: 'Eventos destacados';
+$desc_eventos    = get_field('descripcion_eventos') ?: 'Participa en nuestras actividades y capacitaciones';
 ?>
 
 <section id="news" class="py-20 bg-gray-50">
     <div class="container mx-auto px-4 max-w-7xl">
 
         <h2 class="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-4">
-            Noticias y Eventos
+            <?php echo esc_html($titulo_noticias); ?>
         </h2>
-        <p class="text-center text-gray-500 mb-12">Mantente informado sobre las actividades de la Defensoría Universitaria</p>
+        <p class="text-center text-gray-500 mb-12"><?php echo esc_html($desc_noticias); ?></p>
 
         <?php if ($noticias_query->have_posts()) : ?>
 
@@ -72,7 +78,7 @@ $eventos_query = new WP_Query([
                 </div>
 
                 <!-- Capa oscura para contraste -->
-                <div class="absolute inset-0 bg-linear-to-t from-black/95 via-black/70 to-black/30 pointer-events-none"></div>
+                <div class="absolute inset-0 bg-linear-to-t from-black/95 via-black/60 to-black/30 pointer-events-none"></div>
 
                 <!-- Enlace que cubre toda la tarjeta -->
                 <a href="<?php the_permalink(); ?>" target="_blank" class="absolute inset-0 z-30 block">
@@ -174,8 +180,8 @@ $eventos_query = new WP_Query([
     <div class="container mx-auto px-4 max-w-7xl">
         <div class="relative overflow-hidden rounded-xl">
                 <div>
-                    <h3 class="text-2xl font-bold text-gray-900 mb-4">Eventos Destacados</h3>
-                    <p class="text-gray-600 mb-2">Participa en nuestras actividades y capacitaciones</p>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-4"><?php echo esc_html($titulo_eventos); ?></h3>
+                    <p class="text-gray-600 mb-2"><?php echo esc_html($desc_eventos); ?></p>
                 </div>
                 <div class="flex space-x-3 mt-6">
                     <button id="prev-event"

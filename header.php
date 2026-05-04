@@ -14,29 +14,35 @@
 <?php wp_body_open(); ?>
 
 <header
-    class="bg-gray-900/80 backdrop-blur-md shadow-md fixed w-full top-0 z-50 transition-all duration-300"
+    class="bg-[#141F40] backdrop-blur-md shadow-md fixed w-full top-0 z-50 transition-all duration-300"
     id="main-header"
 >
-    <div class="container mx-auto px-4 lg:px-1 flex justify-between items-center h-20 max-w-[1400px]">
+    <?php 
+    $logo_unsa = get_theme_mod('logo_unsa', get_template_directory_uri() . '/assets/images/unsa-oficinas.png');
+    $logo_oficina = get_theme_mod('logo_oficina', get_template_directory_uri() . '/assets/images/imagotipo_du_black.png');
+    $office_name = get_theme_mod('header_oficina_nombre', 'Defensoría Universitaria');
+    ?>
+
+    <div class="container mx-auto px-4 lg:px-1 lg:py-4 flex justify-between items-center h-20 max-w-[1400px]">
 
         <!-- Logo & Brand -->
         <div class="flex items-center space-x-4">
             <a href="https://www.unsa.edu.pe/" target="_blank" rel="noopener noreferrer" class="flex items-center space-x-3 group">
                 <img
-                    src="<?php echo get_template_directory_uri(); ?>/assets/images/unsa-oficinas.png"
+                    src="<?php echo esc_url($logo_unsa); ?>"
                     alt="Logo UNSA"
-                    class="h-14 w-auto object-contain transition-transform transform group-hover:scale-105"
+                    class="h-18 w-auto object-contain transition-transform transform group-hover:scale-105"
                 />
             </a>
             <a href="<?php echo home_url('/'); ?>" class="flex items-center space-x-3 group">
                 <img
-                    src="<?php echo get_template_directory_uri(); ?>/assets/images/imagotipo_du_black.png"
+                    src="<?php echo esc_url($logo_oficina); ?>"
                     alt="Logo Defensoría UNSA"
-                    class="h-14 w-auto object-contain transition-transform transform group-hover:scale-105"
+                    class="h-16 w-auto object-contain transition-transform transform group-hover:scale-105"
                 />
                 <div class="hidden md:flex flex-col">
                     <span class="font-semibold text-white text-lg leading-tight group-hover:text-gray-400 transition-colors">
-                        Defensoría Universitaria
+                        <?php echo esc_html($office_name); ?>
                     </span>
                     <span class="text-xs text-white font-light tracking-wide">UNSA</span>
                 </div>
@@ -52,7 +58,7 @@
                     'theme_location' => 'primary',
                     'container'      => false,
                     'items_wrap'     => '%3$s',
-                    'walker'         => new Defensoria_Desktop_Walker(),
+                    'walker'         => new Oficina_Desktop_Walker(),
                     'fallback_cb'    => 'defensoria_nav_fallback',
                 ]);
                 ?>
@@ -75,7 +81,7 @@
                 'theme_location' => 'primary',
                 'container'      => false,
                 'items_wrap'     => '%3$s',
-                'walker'         => new Defensoria_Mobile_Walker(),
+                'walker'         => new Oficina_Mobile_Walker(),
                 'fallback_cb'    => false,
             ]);
             ?>

@@ -145,7 +145,7 @@ function about_render_image( $img, $svg_path, $bg = 'bg-blue-50', $color = 'text
                             ];
                             foreach ($principios as $p) : ?>
                             <div class="flex items-center gap-5">
-                                <span class="bg-[#141F40] text-white text-xs font-bold w-18 h-16 rounded-xs flex items-center justify-center flex-shrink-0 shadow-sm">
+                                <span class="bg-[#141F40] text-white text-base font-bold w-18 h-16 rounded-xs flex items-center justify-center flex-shrink-0 shadow-sm">
                                     <?php echo $p['num']; ?>
                                 </span>
                                 <span class="text-2xl font-bold text-gray-900 tracking-tight">

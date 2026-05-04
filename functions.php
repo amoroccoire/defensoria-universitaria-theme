@@ -193,7 +193,7 @@ add_action('after_switch_theme', 'defensoria_rewrite_flush');
 //    Genera: <a class="nav-link ...">Texto<span/></a>
 //    sin los <li> y <ul> de WordPress
 // =============================================
-class Defensoria_Desktop_Walker extends Walker_Nav_Menu {
+class Oficina_Desktop_Walker extends Walker_Nav_Menu {
 
     // Abre cada item — omitimos el <li>
     public function start_el( &$output, $item, $depth = 0, $args = null, $id = 0 ) {
@@ -226,7 +226,7 @@ class Defensoria_Desktop_Walker extends Walker_Nav_Menu {
 // 6. Walker para el nav mobile (header)
 //    Genera: <a class="block px-4 ...">Texto</a>
 // =============================================
-class Defensoria_Mobile_Walker extends Walker_Nav_Menu {
+class Oficina_Mobile_Walker extends Walker_Nav_Menu {
 
     public function start_el( &$output, $item, $depth = 0, $args = null, $id = 0 ) {
         $url    = $item->url ?? '#';
@@ -251,7 +251,7 @@ class Defensoria_Mobile_Walker extends Walker_Nav_Menu {
 // 7. Walker para el footer
 //    Genera: <li><a class="hover:text-blue-400 ...">Texto</a></li>
 // =============================================
-class Defensoria_Footer_Walker extends Walker_Nav_Menu {
+class Oficina_Footer_Walker extends Walker_Nav_Menu {
 
     public function start_el( &$output, $item, $depth = 0, $args = null, $id = 0 ) {
         $url    = $item->url ?? '#';
@@ -267,4 +267,91 @@ class Defensoria_Footer_Walker extends Walker_Nav_Menu {
     }
 
     public function end_el( &$output, $item, $depth = 0, $args = null ) {}
+}
+
+function oficina_customize_register( $wp_customize ) {
+
+    // --- IDENTIDAD DEL HEADER ---
+    $wp_customize->add_section( 'oficina_header_section' , array(
+        'title'      => 'Header: Logos y textos',
+        'priority'   => 30,
+    ) );
+
+    // Logo UNSA
+    $wp_customize->add_setting( 'logo_unsa' );
+    $wp_customize->add_control( new WP_Customize_Image_Control( $wp_customize, 'logo_unsa', array(
+        'label'    => 'Logo UNSA',
+        'section'  => 'oficina_header_section',
+    ) ) );
+
+    // Logo oficina
+    $wp_customize->add_setting( 'logo_oficina' );
+    $wp_customize->add_control( new WP_Customize_Image_Control( $wp_customize, 'logo_oficina', array(
+        'label'    => 'Logo oficina',
+        'section'  => 'oficina_header_section',
+    ) ) );
+
+    // Texto al lado del logo (Nombre de la Oficina)
+    $wp_customize->add_setting( 'header_oficina_nombre', array('default' => 'Defensoría Universitaria') );
+    $wp_customize->add_control( 'header_oficina_nombre', array(
+        'label'    => 'Nombre de la Oficina',
+        'section'  => 'oficina_header_section',
+        'type'     => 'text',
+    ) );
+
+
+    // --- CONFIGURACIÓN DEL HERO ---
+    $wp_customize->add_section( 'oficina_hero_section' , array(
+        'title'      => 'Hero: Imágenes y Contenido',
+        'priority'   => 31,
+    ) );
+
+    // Imágenes del Hero (Carrusel)
+    for ($i = 1; $i <= 5; $i++) {
+        $wp_customize->add_setting( "hero_bg_$i" );
+        $wp_customize->add_control( new WP_Customize_Image_Control( $wp_customize, "hero_bg_$i", array(
+            'label'    => "Imagen de Fondo $i",
+            'section'  => 'oficina_hero_section',
+        ) ) );
+    }
+
+    // Título Principal del Hero
+    $wp_customize->add_setting( 'hero_title', array('default' => 'DEFENSORÍA UNIVERSITARIA') );
+    $wp_customize->add_control( 'hero_title', array(
+        'label'    => 'Título del Hero',
+        'section'  => 'oficina_hero_section',
+        'type'     => 'text',
+    ) );
+
+    // Subtítulo del Hero
+    $wp_customize->add_setting( 'hero_subtitle', array('default' => 'Defender tus derechos nos fortalece') );
+    $wp_customize->add_control( 'hero_subtitle', array(
+        'label'    => 'Subtítulo del Hero',
+        'section'  => 'oficina_hero_section',
+        'type'     => 'textarea',
+    ) );
+
+    $wp_customize->add_setting( 'hero_show_btn', array(
+        'default'           => true,
+        'sanitize_callback' => 'oficina_sanitize_checkbox',
+    ) );
+
+    $wp_customize->add_control( 'hero_show_btn', array(
+        'label'    => '¿Mostrar botón?',
+        'section'  => 'oficina_hero_section',
+        'type'     => 'checkbox',
+    ) );
+
+    // Texto del Botón
+    $wp_customize->add_setting( 'hero_btn_text', array('default' => 'Presentar una queja') );
+    $wp_customize->add_control( 'hero_btn_text', array(
+        'label'    => 'Texto del Botón',
+        'section'  => 'oficina_hero_section',
+        'type'     => 'text',
+    ) );
+}
+add_action( 'customize_register', 'oficina_customize_register' );
+
+function oficina_sanitize_checkbox( $checked ) {
+    return ( ( isset( $checked ) && true == $checked ) ? true : false );
 }

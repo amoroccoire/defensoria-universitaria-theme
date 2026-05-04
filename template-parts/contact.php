@@ -6,7 +6,7 @@
 require_once get_template_directory() . '/includes/contact-data.php';
 ?>
 
-<section id="contact" class="py-20 bg-gray-50">
+<section id="contact" class="py-20 bg-[#F2F2F2]">
     <div class="container mx-auto px-4 max-w-6xl">
 
         <h2 class="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-16">
@@ -45,7 +45,7 @@ require_once get_template_directory() . '/includes/contact-data.php';
                     <div>
                         <h4 class="font-bold text-gray-900 text-lg">Teléfono</h4>
                         <p class="text-gray-600">
-                            <?php echo esc_html($contact_phone); ?>
+                            <?php echo nl2br(esc_html($contact_phone)); ?>
                         </p>
                     </div>
                 </div>
@@ -59,9 +59,9 @@ require_once get_template_directory() . '/includes/contact-data.php';
                     </div>
                     <div>
                         <h4 class="font-bold text-gray-900 text-lg">Email</h4>
-                        <p class="text-gray-600">
+                        <a href="mailto:<?php echo esc_attr($contact_email); ?>" target="_blank" class="text-gray-600 hover:text-blue-600 transition-colors">
                             <?php echo esc_html($contact_email); ?>
-                        </p>
+                        </a>
                     </div>
                 </div>
 

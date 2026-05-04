@@ -54,15 +54,16 @@ if ($miembros_query->have_posts()) {
     wp_reset_postdata();
 }
 
-// Ordenar secundarios por campo miembro_orden
 usort($secundarios, fn($a, $b) => $a['orden'] - $b['orden']);
+
+$titulo_team = get_field('equipo_title') ?: 'Nuestro equipo';
 ?>
 
 <section id="team" class="py-20 bg-white">
-    <div class="container mx-auto px-4 max-w-6xl">
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
 
-        <h2 class="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-16">
-            Nuestro equipo
+        <h2 class="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-8">
+            <?php echo esc_html($titulo_team); ?>
         </h2>
 
         <?php if (!$principal && empty($secundarios) && empty($exmiembros)) : ?>
@@ -109,13 +110,6 @@ usort($secundarios, fn($a, $b) => $a['orden'] - $b['orden']);
                 >
                     <div class="p-6 flex flex-col items-center text-center">
 
-                        <!-- Número de orden -->
-                        <!--<div class="self-start mb-3">
-                            <span class="text-xs font-bold text-gray-300 tracking-widest">
-                                /*<?php echo str_pad($miembro['orden'], 2, '0', STR_PAD_LEFT); ?>*/
-                            </span>
-                        </div>-->
-
                         <?php if ($miembro['image']) : ?>
                         <div class="w-28 h-28 rounded-full overflow-hidden mb-4 border-2 border-gray-200">
                             <img
@@ -133,7 +127,7 @@ usort($secundarios, fn($a, $b) => $a['orden'] - $b['orden']);
                             <?php echo esc_html($miembro['cargo']); ?>
                         </p>
                         <?php if ($miembro['bio_short']) : ?>
-                        <p class="text-gray-500 text-sm line-clamp-2 leading-relaxed">
+                        <p class="text-gray-500 text-sm line-clamp-4 leading-relaxed">
                             <?php echo esc_html($miembro['bio_short']); ?>
                         </p>
                         <?php endif; ?>

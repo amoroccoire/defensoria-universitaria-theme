@@ -17,20 +17,30 @@ document.addEventListener('DOMContentLoaded', () => {
     const DOCS = window.BIBLIOTECA_DOCS || [];
     const CAT_COLORES = window.CAT_COLORES || {};
 
-    // ── Búsqueda en tiempo real ──────────────────────────
+    function safeUrl(url) {
+        if (!url || typeof url !== 'string') return '';
+        try {
+            const parsed = new URL(url);
+            return (parsed.protocol === 'https:' || parsed.protocol === 'http:') ? url : '';
+        } catch {
+            return '';
+        }
+    }
+
+    function el(tag, className, text) {
+        const node = document.createElement(tag);
+        if (className) node.className = className;
+        if (text !== undefined) node.textContent = text;
+        return node;
+    }
+
     searchInput?.addEventListener('input', (e) => {
         const q = e.target.value.toLowerCase().trim();
-
-        // Iteramos sobre las tarjetas
+ 
         document.querySelectorAll('#biblioteca-grid > div.group').forEach(card => {
             const titleElement = card.querySelector('.js-search-title');
             const title = titleElement ? titleElement.textContent.toLowerCase() : '';
-
-            if (title.includes(q)) {
-                card.style.display = '';
-            } else {
-                card.style.display = 'none';
-            }
+            card.style.display = title.includes(q) ? '' : 'none';
         });
     });
 
@@ -39,11 +49,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const doc = DOCS.find(d => d.id == id);
         if (!doc) return;
 
-        const versions = doc.versions || [];
-        const current = versions.length > 0 ? versions[versions.length - 1] : null;
-        const history = versions.length > 1 ? versions.slice(0, -1).reverse() : [];
+        const versions = Array.isArray(doc.versions) ? doc.versions : [];
+        const current  = versions.length > 0 ? versions[versions.length - 1] : null;
+        const history  = versions.length > 1 ? versions.slice(0, -1).reverse() : [];
 
-        // Categoría
+        // Categoria
         const catClase = CAT_COLORES[doc.category] || 'bg-gray-100 text-gray-700 border-gray-200';
         const catEl = document.getElementById('panel-category');
         catEl.className = `inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold border mb-3 ${catClase}`;
@@ -52,15 +62,17 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('panel-title').textContent = doc.title;
         document.querySelector('#panel-year span').textContent = doc.year;
 
-        // Versión actual
+        // Version actual
         if (current) {
             document.getElementById('panel-ver-numero').textContent = current.numero || '';
             document.getElementById('panel-ver-fecha').textContent = current.fecha || '';
             document.getElementById('panel-ver-notas').textContent = current.notas || '';
 
             const dlBtn = document.getElementById('panel-download-btn');
-            if (current.url) {
-                dlBtn.href = current.url;
+            const url   = safeUrl(current.url);
+
+            if (url) {
+                dlBtn.href = url;
                 dlBtn.classList.remove('opacity-50', 'pointer-events-none');
             } else {
                 dlBtn.href = '#';
@@ -70,31 +82,55 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Historial
         const histEl = document.getElementById('panel-history');
+        histEl.innerHTML = '';
+
         if (history.length === 0) {
-            histEl.innerHTML = '<p class="text-sm text-gray-400 italic">No hay versiones anteriores.</p>';
+            histEl.appendChild(el('p', 'text-sm text-gray-400 italic', 'No hay versiones anteriores.'));
         } else {
-            histEl.innerHTML = history.map(v => `
-                <div class="bg-white p-4 flex gap-4 transition-colors">
-                    <div class="flex flex-col content-center flex-shrink-0">
-                        <span class="bg-gray-100 text-gray-700 text-center px-2 py-1 font-bold text-sm">${v.numero || ''}</span>
-                        <p class="text-xs text-gray-500 mb-1">${v.fecha || ''}</p>
-                    </div>
-                    <div class="flex-grow min-w-0">
-                        <p class="text-sm text-gray-700 line-clamp-3">${v.notas || '-'}</p>
-                    </div>
-                    ${v.url ? `
-                    <div class="flex-shrink-0 flex items-center">
-                        <a href="${v.url}" download target="_blank"
-                            class="p-2 text-[#141F40] hover:bg-blue-50 rounded-lg transition-colors"
-                            title="Descargar esta versión">
-                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
-                            </svg>
-                        </a>
-                    </div>` : ''}
-                </div>
-            `).join('');
+            history.forEach(v => {
+                // Contenedor principal
+                const row = el('div', 'bg-white p-4 flex gap-4 transition-colors');
+ 
+                // ── Columna izquierda: versión + fecha ──────────────────────
+                const colLeft = el('div', 'flex flex-col content-center flex-shrink-0');
+                colLeft.appendChild(el('span', 'bg-gray-100 text-gray-700 text-center px-2 py-1 font-bold text-sm', v.numero || ''));
+                colLeft.appendChild(el('p',    'text-xs text-gray-500 mb-1', v.fecha || ''));
+                row.appendChild(colLeft);
+ 
+                // ── Columna central: notas ──────────────────────────────────
+                row.appendChild(el('p', 'flex-grow min-w-0 text-sm text-gray-700 line-clamp-3', v.notas || '-'));
+ 
+                // ── Columna derecha: botón de descarga (sólo si URL válida) ─
+                const url = safeUrl(v.url);
+                if (url) {
+                    const colRight = el('div', 'flex-shrink-0 flex items-center');
+                    const a = document.createElement('a');
+                    a.href      = url;
+                    a.download  = '';
+                    a.target    = '_blank';
+                    a.rel       = 'noopener noreferrer';
+                    a.className = 'p-2 text-[#141F40] hover:bg-blue-50 rounded-lg transition-colors';
+                    a.title     = 'Descargar esta versión';
+                    a.setAttribute('aria-label', `Descargar versión ${v.numero || ''}`);
+                    // SVG creado con DOM — sin innerHTML
+                    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                    svg.setAttribute('class', 'w-5 h-5');
+                    svg.setAttribute('fill', 'none');
+                    svg.setAttribute('viewBox', '0 0 24 24');
+                    svg.setAttribute('stroke', 'currentColor');
+                    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                    path.setAttribute('stroke-linecap', 'round');
+                    path.setAttribute('stroke-linejoin', 'round');
+                    path.setAttribute('stroke-width', '2');
+                    path.setAttribute('d', 'M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4');
+                    svg.appendChild(path);
+                    a.appendChild(svg);
+                    colRight.appendChild(a);
+                    row.appendChild(colRight);
+                }
+ 
+                histEl.appendChild(row);
+            });
         }
 
         // Animación de apertura
@@ -125,9 +161,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('panel-close')?.addEventListener('click', closePanel);
     backdrop.addEventListener('click', closePanel);
-    panel.addEventListener('click', (e) => {
-        if (e.target === panel) closePanel();
-    });
+    panel.addEventListener('click', (e) => { if (e.target === panel) closePanel(); });
+
 
     // Cerrar con tecla Escape
     document.addEventListener('keydown', (e) => {

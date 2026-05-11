@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <?php wp_head(); ?>
 </head>
-<body class="font-sans antialiased <?php body_class(); ?>">
+<body class="font-poppins antialiased <?php body_class(); ?>">
 <?php wp_body_open(); ?>
 
 <header

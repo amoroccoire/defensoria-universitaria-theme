@@ -187,6 +187,24 @@ function defensoria_rewrite_flush() {
 }
 add_action('after_switch_theme', 'defensoria_rewrite_flush');
 
+// 1. Registro del CPT para las tarjetas del Hero
+function defensoria_register_hero_cards_cpt() {
+    register_post_type('hero_card', [
+        'labels' => [
+            'name'          => 'Tarjetas Hero',
+            'singular_name' => 'Tarjeta Hero',
+            'add_new'       => 'Añadir Nueva Tarjeta',
+            'add_new_item'  => 'Añadir Nueva Tarjeta al Hero',
+            'edit_item'     => 'Editar Tarjeta',
+        ],
+        'public'        => true,
+        'show_in_menu'  => true,
+        'menu_icon'     => 'dashicons-images-alt2',
+        'supports'      => ['title', 'thumbnail', 'excerpt'], // Usaremos el extracto para la descripción
+        'has_archive'   => false,
+    ]);
+}
+add_action('init', 'defensoria_register_hero_cards_cpt');
 
 // =============================================
 // 5. Walker para el nav desktop (header)

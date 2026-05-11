@@ -14,8 +14,8 @@ if ( empty($hero_images) ) {
 $total_images = count($hero_images);
 ?>
 
-<section class="relative min-h-screen flex items-center justify-center overflow-hidden bg-gray-900">
-    <div class="absolute inset-0 z-0 bg-gray-900">
+<section class="relative min-h-screen flex items-center justify-center bg-gray-900">
+    <div class="absolute inset-0 z-0 bg-gray-900 overflow-hidden">
 
         <?php foreach ( $hero_images as $index => $url ) : ?>
             <img
@@ -28,7 +28,7 @@ $total_images = count($hero_images);
                     }
                 ?>"
                 style="<?php 
-                    if ( $total_images > 2 && $index > 0 ) {
+                    if ( $total_images > 1 && $index > 0 ) {
                         echo "animation-delay: " . ($index * 6) . "s;"; 
                     }
                 ?>"
@@ -38,11 +38,11 @@ $total_images = count($hero_images);
     </div>
 
     <!-- Main Content -->
-    <div class="relative z-10 container mx-auto px-4 text-center">
-        <h1 class="text-4xl md:text-5xl lg:text-[55px] font-[480] text-white mb-16 drop-shadow-lg tracking-wider">
+    <div class="relative z-10 container mx-auto px-4 text-center -mt-50 md:-mt-18">
+        <h1 class="text-start text-[2.5em]/11 md:text-[4em]/16 lg:text-[4em] text-white mb-8 drop-shadow-lg tracking-wide md:tracking-[0.12em] font-poppins font-bold">
             <?php echo esc_html(get_theme_mod('hero_title', 'DEFENSORÍA UNIVERSITARIA')); ?>
         </h1>
-        <p class="text-lg md:text-[30px] text-gray-100 font-normal mb-10 max-w-2xl mx-auto drop-shadow-md tracking-wide">
+        <p class="text-start text-sm md:text-[1.2em] text-gray-200 font-poppins font-normal mb-5 md:mb-10 max-w-6xl drop-shadow-md tracking-wide">
             <?php echo esc_html(get_theme_mod('hero_subtitle', 'Defender tus derechos nos fortalece')); ?>
         </p>
 
@@ -53,12 +53,15 @@ $total_images = count($hero_images);
 
         if ( $show_button && !empty($btn_text) ) : 
         ?>
-            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <div class="flex gap-4 justify-start">
                 <a href="#contact" 
-                class="px-8 py-3 bg-[#b90615] hover:bg-[#8C0712] text-white font-semibold rounded-sm shadow-lg transition-all transform hover:-translate-y-1">
+                class="px-3 md:px-8 py-3 bg-[#b90615] hover:bg-[#8C0712] text-white font-semibold shadow-lg transition-all transform hover:-translate-y-1 font-poppins text-[0.75rem] md:text-[1em]">
                     <?php echo esc_html($btn_text); ?>
                 </a>
             </div>
         <?php endif; ?>
     </div>
+    <?php
+    get_template_part('template-parts/hero-cards');
+    ?>
 </section>

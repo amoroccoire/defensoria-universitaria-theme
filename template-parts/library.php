@@ -24,7 +24,6 @@ include get_template_directory() . '/template-parts/library/library-queries.php'
         <div class="flex flex-col lg:flex-row gap-8 items-start">
 
             <?php include get_template_directory() . '/template-parts/library/library-sidebar.php'; ?>
-
             <?php include get_template_directory() . '/template-parts/library/library-grid.php'; ?>
 
         </div>

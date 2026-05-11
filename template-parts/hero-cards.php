@@ -71,7 +71,7 @@ $total_posts = $cards_query->found_posts;
 
                     <div class="absolute inset-0 bg-black/60 flex flex-col justify-start p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out">
                         <div class="w-full h-40 max-w-full mb-6 text-center">
-                            <p class="text-white text-[0.75rem] md:text-base opacity-0 group-hover:opacity-100 transition-opacity delay-100 overflow-hidden line-clamp-6 lg:line-clamp-8 break-words">
+                            <p class="text-white text-[0.75rem] md:text-sm opacity-0 group-hover:opacity-100 transition-opacity delay-100 overflow-hidden line-clamp-6 lg:line-clamp-7 break-words">
                                 <?php echo esc_html(get_the_excerpt()); ?>
                             </p>
                         </div>

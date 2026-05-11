@@ -69,10 +69,12 @@ $total_posts = $cards_query->found_posts;
 
                     <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent opacity-80 group-hover:opacity-0 transition-opacity duration-300"></div>
 
-                    <div class="absolute inset-0 bg-black/60 flex flex-col justify-end p-6 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out">
-                        <p class="text-white text-sm leading-snug mb-2 opacity-0 group-hover:opacity-100 transition-opacity delay-100">
-                            <?php echo esc_html(get_the_excerpt()); ?>
-                        </p>
+                    <div class="absolute inset-0 bg-black/60 flex flex-col justify-start p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out">
+                        <div class="w-full h-40 max-w-full mb-6 text-center">
+                            <p class="text-white text-[0.75rem] md:text-base opacity-0 group-hover:opacity-100 transition-opacity delay-100 overflow-hidden line-clamp-6 lg:line-clamp-8 break-words">
+                                <?php echo esc_html(get_the_excerpt()); ?>
+                            </p>
+                        </div>
                         <span class="text-xs text-blue-300 font-bold tracking-widest uppercase">Ver más →</span>
                     </div>
 

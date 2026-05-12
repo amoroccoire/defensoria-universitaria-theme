@@ -1,4 +1,15 @@
-<?php 
+<?php
+$args = array(
+    'post_type'      => 'hero_card',
+    'posts_per_page' => -1,
+    'post_status'    => 'publish',
+    'order'          => 'ASC',
+);
+$cards_query = new WP_Query($args);
+
+$total_posts = $cards_query->found_posts;
+
+//hero images
 $hero_images = [];
 for ($i = 1; $i <= 5; $i++) {
     $img = get_theme_mod("hero_bg_$i");
@@ -41,8 +52,10 @@ $total_images = count($hero_images);
      <?php
         $center = get_theme_mod('hero_center_content', false);
         $content_classes = $center ? 'text-center' : 'text-start';
+
+        $mobile_position = $total_posts > 0 ? '-mt-50' : '-mt-22';
      ?>
-    <div class="relative z-10 container mx-auto px-4 text-center -mt-50 md:-mt-30 lg:-mt-18">
+    <div class="relative z-10 container mx-auto px-4 text-center <?php echo esc_html($mobile_position); ?> md:-mt-30 lg:-mt-18">
         <h1 class="<?php echo esc_html($content_classes); ?> text-[2.5em]/11 md:text-[4em]/16 lg:text-[4em] text-white mb-4 md:mb-8 drop-shadow-lg tracking-wide md:tracking-[0.12em] font-poppins font-bold">
             <?php echo esc_html(get_theme_mod('hero_title', 'DEFENSORÍA UNIVERSITARIA')); ?>
         </h1>

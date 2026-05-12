@@ -2,6 +2,7 @@
 /**
  * Header del tema Defensoría Universitaria - UNSA
  */
+$bg_color   = get_theme_mod('header_footer_color', '#141F40');
 ?>
 <!DOCTYPE html>
 <html <?php language_attributes(); ?>>
@@ -14,7 +15,8 @@
 <?php wp_body_open(); ?>
 
 <header
-    class="bg-[#141F40] backdrop-blur-md shadow-md fixed w-full top-0 z-50 transition-all duration-300"
+    style="--header-footer-bg: <?php echo esc_attr($bg_color); ?>;"
+    class="bg-[color:var(--header-footer-bg)] backdrop-blur-md shadow-md fixed w-full top-0 z-50 transition-all duration-300"
     id="main-header"
 >
     <?php 

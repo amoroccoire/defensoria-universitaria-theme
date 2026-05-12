@@ -226,7 +226,7 @@ class Oficina_Desktop_Walker extends Walker_Nav_Menu {
                    : '';
 
         $output .= sprintf(
-            '<a href="%s" target="%s"%s class="nav-link px-4 py-2 text-white font-medium hover:text-gray-400 rounded-lg transition-colors relative group%s">%s<span class="absolute bottom-0 left-0 w-full h-0.5 bg-gray-400 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></span></a>',
+            '<a href="%s" target="%s"%s class="nav-link px-4 py-2 text-white font-medium hover:text-white/60 rounded-lg transition-colors relative group%s">%s<span class="absolute bottom-0 left-0 w-full h-0.5 bg-gray-400 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></span></a>',
             esc_url( $url ),
             esc_attr( $target ),
             $rel,
@@ -254,7 +254,7 @@ class Oficina_Mobile_Walker extends Walker_Nav_Menu {
         $target = ! empty( $item->target ) ? $item->target : '_self';
 
         $output .= sprintf(
-            '<a href="%s" target="%s" class="block px-4 py-2 text-gray-700 font-medium hover:text-blue-600 hover:bg-gray-50 rounded-lg">%s</a>',
+            '<a href="%s" target="%s" class="block px-4 py-2 text-gray-700 hover:text-gray-900 font-medium rounded-lg">%s</a>',
             esc_url( $url ),
             esc_attr( $target ),
             esc_html( $title )
@@ -279,7 +279,7 @@ class Oficina_Footer_Walker extends Walker_Nav_Menu {
         $target = ! empty( $item->target ) ? $item->target : '_self';
 
         $output .= sprintf(
-            '<li><a href="%s" target="%s" class="hover:text-blue-400 transition-colors flex items-center group"><svg class="w-3 h-3 mr-2 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>%s</a></li>',
+            '<li><a href="%s" target="%s" class="hover:text-white/60 transition-colors flex items-center group"><svg class="w-3 h-3 mr-2 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>%s</a></li>',
             esc_url( $url ),
             esc_attr( $target ),
             esc_html( $title )
@@ -291,9 +291,9 @@ class Oficina_Footer_Walker extends Walker_Nav_Menu {
 
 function oficina_customize_register( $wp_customize ) {
 
-    // --- IDENTIDAD DEL HEADER ---
+    // --- IDENTIDAD DEL HEADER Y FOOTER---
     $wp_customize->add_section( 'oficina_header_section' , array(
-        'title'      => 'Header: Logos y textos',
+        'title'      => 'Header y Footer: Logos y textos',
         'priority'   => 30,
     ) );
 
@@ -319,6 +319,19 @@ function oficina_customize_register( $wp_customize ) {
         'type'     => 'text',
     ) );
 
+    // Color del footer y header
+    $wp_customize->add_setting( 'header_footer_color', array(
+        'default'           => '#141F40',
+        'sanitize_callback' => 'sanitize_hex_color',
+        'transport'         => 'refresh',
+    ) );
+
+    $wp_customize->add_control( new WP_Customize_Color_Control( $wp_customize, 'header_footer_color', array(
+        'label'    => 'Color del Header y Footer',
+        'section'  => 'oficina_header_section',
+        'settings' => 'header_footer_color',
+    ) ) );
+
 
     // --- CONFIGURACIÓN DEL HERO ---
     $wp_customize->add_section( 'oficina_hero_section' , array(
@@ -343,10 +356,10 @@ function oficina_customize_register( $wp_customize ) {
         'type'     => 'text',
     ) );
 
-    // Subtítulo del Hero
+    // Resumen del Hero de la oficina
     $wp_customize->add_setting( 'hero_subtitle', array('default' => 'Defender tus derechos nos fortalece') );
     $wp_customize->add_control( 'hero_subtitle', array(
-        'label'    => 'Subtítulo del Hero',
+        'label'    => 'Resumen de la oficina en el Hero',
         'section'  => 'oficina_hero_section',
         'type'     => 'textarea',
     ) );
@@ -369,6 +382,32 @@ function oficina_customize_register( $wp_customize ) {
         'section'  => 'oficina_hero_section',
         'type'     => 'text',
     ) );
+
+    // Color del Botón
+    $wp_customize->add_setting( 'hero_btn_color', array(
+        'default'           => '#b90615',
+        'sanitize_callback' => 'sanitize_hex_color',
+        'transport'         => 'refresh',
+    ) );
+
+    $wp_customize->add_control( new WP_Customize_Color_Control( $wp_customize, 'hero_btn_color', array(
+        'label'    => 'Color del Botón',
+        'section'  => 'oficina_hero_section',
+        'settings' => 'hero_btn_color',
+    ) ) );
+
+    // Color del hover Botón
+    $wp_customize->add_setting( 'hero_hover_btn_color', array(
+        'default'           => '#8C0712',
+        'sanitize_callback' => 'sanitize_hex_color',
+        'transport'         => 'refresh',
+    ) );
+
+    $wp_customize->add_control( new WP_Customize_Color_Control( $wp_customize, 'hero_hover_btn_color', array(
+        'label'    => 'Color del Botón (Hover)',
+        'section'  => 'oficina_hero_section',
+        'settings' => 'hero_hover_btn_color',
+    ) ) );
 
     //Centrar contenido del Hero
     $wp_customize->add_setting('hero_center_content', array(

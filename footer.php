@@ -1,9 +1,13 @@
 <?php
 include get_template_directory() . '/includes/contact-data.php';
 global $contact_address, $contact_phone, $contact_email, $contact_hours, $social_links, $social_icons;
+
+$bg_color   = get_theme_mod('header_footer_color', '#141F40');
 ?>
 
-<footer class="bg-[#141F40] text-gray-300 py-12 border-t border-gray-800">
+<footer 
+    style="--header-footer-bg: <?php echo esc_attr($bg_color); ?>;"
+    class="bg-[color:var(--header-footer-bg)] text-gray-300 py-12 border-t border-gray-800">
     <?php 
     $logo_unsa = get_theme_mod('logo_unsa', get_template_directory_uri() . '/assets/images/unsa-oficinas.png');
     $logo_oficina = get_theme_mod('logo_oficina', get_template_directory_uri() . '/assets/images/imagotipo_du_black.png');
@@ -33,8 +37,7 @@ global $contact_address, $contact_phone, $contact_email, $contact_hours, $social
                     </div>
                 </div>
                 <p class="text-sm leading-relaxed text-gray-400">
-                    La Defensoría Universitaria es el órgano encargado de la tutela de los derechos
-                    de los miembros de la comunidad universitaria.
+                    <?php echo esc_html(get_theme_mod('hero_subtitle', 'Defender tus derechos nos fortalece')); ?>
                 </p>
             </div>
 
@@ -42,7 +45,7 @@ global $contact_address, $contact_phone, $contact_email, $contact_hours, $social
             <div class="lg:pl-10">
                 <h3 class="text-white font-bold text-lg mb-6 relative inline-block">
                     Enlaces rápidos
-                    <span class="absolute -bottom-2 left-0 w-10 h-1 bg-blue-600 rounded-full"></span>
+                    <span class="absolute -bottom-2 left-0 w-10 h-1 bg-white/70 rounded-full"></span>
                 </h3>
                 <ul class="space-y-3 text-sm mt-2">
                     <?php
@@ -60,7 +63,7 @@ global $contact_address, $contact_phone, $contact_email, $contact_hours, $social
             <div>
                 <h3 class="text-white font-bold text-lg mb-6 relative inline-block">
                     Contacto
-                    <span class="absolute -bottom-2 left-0 w-10 h-1 bg-blue-600 rounded-full"></span>
+                    <span class="absolute -bottom-2 left-0 w-10 h-1 bg-white/70 rounded-full"></span>
                 </h3>
                 <ul class="space-y-4 text-sm mt-2">
 

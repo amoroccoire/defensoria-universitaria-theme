@@ -42,8 +42,8 @@ $total_images = count($hero_images);
         $center = get_theme_mod('hero_center_content', false);
         $content_classes = $center ? 'text-center' : 'text-start';
      ?>
-    <div class="relative z-10 container mx-auto px-4 text-center -mt-50 md:-mt-18">
-        <h1 class="<?php echo esc_html($content_classes); ?> text-[2.5em]/11 md:text-[4em]/16 lg:text-[4em] text-white mb-8 drop-shadow-lg tracking-wide md:tracking-[0.12em] font-poppins font-bold">
+    <div class="relative z-10 container mx-auto px-4 text-center -mt-50 md:-mt-30 lg:-mt-18">
+        <h1 class="<?php echo esc_html($content_classes); ?> text-[2.5em]/11 md:text-[4em]/16 lg:text-[4em] text-white mb-4 md:mb-8 drop-shadow-lg tracking-wide md:tracking-[0.12em] font-poppins font-bold">
             <?php echo esc_html(get_theme_mod('hero_title', 'DEFENSORÍA UNIVERSITARIA')); ?>
         </h1>
         <p class="<?php echo $center ? 'text-center m-auto' : 'text-start'; ?> text-sm md:text-[1.2em] text-gray-200 font-poppins font-normal mb-5 md:mb-10 max-w-6xl drop-shadow-md tracking-wide">
@@ -54,12 +54,16 @@ $total_images = count($hero_images);
         
         $show_button = get_theme_mod('hero_show_btn', true);
         $btn_text    = get_theme_mod('hero_btn_text', 'Presentar una queja');
+        $btn_color   = get_theme_mod('hero_btn_color', '#b90615');
+        $hover_btn_color = get_theme_mod('hero_hover_btn_color', '#8C0712');
 
         if ( $show_button && !empty($btn_text) ) : 
         ?>
             <div class="flex gap-4 <?php echo $center ? 'justify-center' : 'justify-start'; ?>">
                 <a href="#contact" 
-                class="px-3 md:px-8 py-3 bg-[#b90615] hover:bg-[#8C0712] text-white font-semibold shadow-lg transition-all transform hover:-translate-y-1 font-poppins text-[0.75rem] md:text-[1em]">
+                style="--hero-btn-bg: <?php echo esc_attr($btn_color); ?>; 
+                       --hero-hover-btn-bg: <?php echo esc_attr($hover_btn_color); ?>;"
+                class="px-3 md:px-8 py-3 bg-[color:var(--hero-btn-bg)] hover:bg-[color:var(--hero-hover-btn-bg)] text-white font-semibold shadow-lg transition-all transform hover:-translate-y-1 font-poppins text-[0.75rem] md:text-[1em]">
                     <?php echo esc_html($btn_text); ?>
                 </a>
             </div>

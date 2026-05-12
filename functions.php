@@ -193,7 +193,7 @@ add_action('after_switch_theme', 'defensoria_rewrite_flush');
 function defensoria_register_hero_cards_cpt() {
     register_post_type('hero_card', [
         'labels' => [
-            'name'          => 'Tarjetas Hero',
+            'name'          => 'Tarjetas del Hero',
             'singular_name' => 'Tarjeta Hero',
             'add_new'       => 'Añadir Nueva Tarjeta',
             'add_new_item'  => 'Añadir Nueva Tarjeta al Hero',
@@ -369,6 +369,18 @@ function oficina_customize_register( $wp_customize ) {
         'section'  => 'oficina_hero_section',
         'type'     => 'text',
     ) );
+
+    //Centrar contenido del Hero
+    $wp_customize->add_setting('hero_center_content', array(
+        'default'   => false,
+        'sanitize_callback' => 'oficina_sanitize_checkbox',
+    ));
+
+    $wp_customize->add_control('hero_center_content', array(
+        'label'    => '¿Centrar contenido del Hero?',
+        'section'  => 'oficina_hero_section',
+        'type'     => 'checkbox',
+    ));
 }
 add_action( 'customize_register', 'oficina_customize_register' );
 

@@ -12,7 +12,7 @@ if ( $docs_query->have_posts() ) {
         $url_actual     = wp_http_validate_url( $url_actual_raw ) ? $url_actual_raw : '';
 
         $version_actual = [
-            'numero' => sanitize_text_field( get_field( 'documento_notas', $id ) ?: 'v1.0.0' ),
+            'numero' => sanitize_text_field( get_field( 'documento_numero_version', $id ) ?: '1.0.0' ),
             'fecha'  => sanitize_text_field( get_the_date( 'd/m/Y', $id ) ),
             'notas'  => wp_kses_post( get_field( 'documento_notas', $id ) ?: '' ),
             'url'    => $url_actual,
@@ -38,7 +38,7 @@ if ( $docs_query->have_posts() ) {
             $history_js[] = [
                 'id'    => $v->ID,
                 'title' => sanitize_text_field( get_the_title( $v->ID ) ),
-                'numero' => sanitize_text_field( get_field( 'documento_notas', $v->ID ) ?: 'v1.0.0' ),
+                'numero' => sanitize_text_field( get_field( 'documento_numero_version', $v->ID ) ?: '1.0.0' ),
                 'fecha'  => sanitize_text_field( get_the_date( 'd/m/Y', $v->ID ) ),
                 'notas'  => wp_kses_post( get_field( 'documento_notas', $v->ID ) ?: '' ),
                 'url'    => $v_url,
@@ -75,10 +75,4 @@ window.BIBLIOTECA_MAX_PAGES   = <?php echo intval( $docs_query->max_num_pages );
 window.BIBLIOTECA_CATEGORIES  = <?php echo wp_json_encode( array_map( function($cat) { return $cat->slug; }, $categorias ), $flags ); ?>;
 window.BIBLIOTECA_TYPES       = <?php echo wp_json_encode( $types_available, $flags ); ?>;
 window.BIBLIOTECA_YEARS       = <?php echo wp_json_encode( $years_available, $flags ); ?>;
-window.CAT_COLORES = {
-    'Boletines':       'bg-blue-100 text-blue-700 border-blue-200',
-    'Informes':        'bg-purple-100 text-purple-700 border-purple-200',
-    'Reglamentos':     'bg-amber-100 text-amber-700 border-amber-200',
-    'Investigaciones': 'bg-emerald-100 text-emerald-700 border-emerald-200',
-};
 </script>

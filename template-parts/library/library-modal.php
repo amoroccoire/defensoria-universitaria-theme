@@ -34,7 +34,7 @@
             <div id="panel-current-version" class="flex flex-row p-3">
                 <div class="flex flex-col mr-3">
                     <div class="flex justify-center items-center mb-3">
-                        <span id="panel-ver-numero" class="bg-[#141F40] text-white px-2.5 py-1 rounded-xs text-sm font-bold"></span>
+                        <span id="panel-ver-numero" class="bg-[#141F40] text-white px-2.5 py-1 rounded-xs text-sm font-bold">gaa</span>
                     </div>
                     <p id="panel-ver-fecha" class="text-xs text-gray-500 mb-2"></p>
                 </div>

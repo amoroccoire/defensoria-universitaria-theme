@@ -24,7 +24,7 @@ class CategoryCriteria extends Criteria {
                 'taxonomy' => 'categoria_documento',
                 'field'    => 'slug',
                 'terms'    => $categories,
-                'operator' => 'AND',
+                'operator' => 'IN',
             ];
         }
     }
@@ -63,12 +63,14 @@ class TitleSearchCriteria extends Criteria {
 }
 
 class TypeCriteria extends Criteria {
-    public function __construct($type = '') {
-        if (!empty($type)) {
+    public function __construct($types = []) {
+        if (!empty($types)) {
+            $types_array = is_array($types) ? $types : [$types];
+
             $this->args['meta_query'][] = [
                 'key'     => 'documento_tipo',
-                'value'   => sanitize_text_field($type),
-                'compare' => 'LIKE',
+                'value'   => array_map('sanitize_text_field', $types_array),
+                'compare' => 'IN',
             ];
         }
     }

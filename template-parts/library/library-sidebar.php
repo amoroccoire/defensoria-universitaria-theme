@@ -14,9 +14,6 @@
 
         <div class="flex justify-between items-center mb-4 py-4">
             <h3 class="font-bold px-3 text-gray-900">Categorías</h3>
-            <?php if (!empty($cat_filter)) : ?>
-            <button id="clear-categories" class="text-xs mr-3 text-blue-600 hover:underline">Limpiar</button>
-            <?php endif; ?>
         </div>
         <?php if (!empty($categorias) && !is_wp_error($categorias)) : ?>
         <ul class="space-y-2 px-3">
@@ -50,27 +47,15 @@
                 <?php endif; ?>
             </div>
             <ul class="space-y-1 px-3">
-                <li>
-                    <label class="flex items-center text-sm py-1.5 px-2 rounded-xs transition-colors hover:bg-gray-50 cursor-pointer">
-                        <input
-                            type="radio"
-                            name="tipo"
-                            value=""
-                            class="filter-radio mr-2 text-blue-600 focus:ring-blue-500"
-                            <?php echo empty($type_filter) ? 'checked' : ''; ?>
-                        />
-                        <span>Todos</span>
-                    </label>
-                </li>
                 <?php foreach ($types_available as $type) : ?>
                 <li>
                     <label class="flex items-center text-sm py-1.5 px-2 rounded-xs transition-colors hover:bg-gray-50 cursor-pointer">
                         <input
-                            type="radio"
-                            name="tipo"
+                            type="checkbox"
+                            name="tipo[]"
                             value="<?php echo esc_attr($type); ?>"
-                            class="filter-radio mr-2 text-blue-600 focus:ring-blue-500"
-                            <?php echo $type_filter === $type ? 'checked' : ''; ?>
+                            class="filter-checkbox mr-2 text-blue-600 focus:ring-blue-500"
+                            <?php echo (is_array($type_filter) && in_array($type, $type_filter)) ? 'checked' : ''; ?>
                         />
                         <span><?php echo esc_html(strtoupper($type)); ?></span>
                     </label>

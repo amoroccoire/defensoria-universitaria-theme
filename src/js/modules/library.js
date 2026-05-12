@@ -1,7 +1,7 @@
 // =============================================
 // Módulo: Biblioteca
 // Slide panel con historial de versiones + búsqueda
-// Requiere: window.BIBLIOTECA_DOCS y window.CAT_COLORES
+// Requiere: window.BIBLIOTECA_DOCS
 // definidos en template-parts/biblioteca.php
 // =============================================
 
@@ -15,7 +15,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!panel) return;
 
     const DOCS = window.BIBLIOTECA_DOCS || [];
-    const CAT_COLORES = window.CAT_COLORES || {};
 
     function safeUrl(url) {
         if (!url || typeof url !== 'string') return '';
@@ -79,8 +78,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     function getCurrentFilters() {
-        const categories = Array.from(document.querySelectorAll('.filter-checkbox:checked')).map(cb => cb.value);
-        const type = document.querySelector('.filter-radio[name="tipo"]:checked')?.value || '';
+        const categories = Array.from(document.querySelectorAll('.filter-checkbox[name="categoria[]"]:checked')).map(cb => cb.value);
+        const type = Array.from(document.querySelectorAll('.filter-checkbox[name="tipo[]"]:checked')).map(cb => cb.value);
         const yearFrom = document.getElementById('year-from')?.value || '';
         const yearTo = document.getElementById('year-to')?.value || '';
         const busqueda = document.getElementById('biblioteca-search')?.value || '';
@@ -143,11 +142,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function updatePagination(paginationHtml) {
-        // Assuming pagination is after the grid
         const grid = document.getElementById('biblioteca-grid');
         if (grid && grid.nextElementSibling) {
-            grid.nextElementSibling.outerHTML = paginationHtml;
-            // Re-attach pagination listeners
+            grid.nextElementSibling.innerHTML = paginationHtml;
             attachPaginationListeners();
         }
     }
@@ -177,9 +174,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const history  = versions.length > 1 ? versions.slice(0, -1).reverse() : [];
 
         // Categoria
-        const catClase = CAT_COLORES[doc.category] || 'bg-gray-100 text-gray-700 border-gray-200';
         const catEl = document.getElementById('panel-category');
-        catEl.className = `inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold border mb-3 ${catClase}`;
+        catEl.className = `inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold border mb-3`;
         catEl.textContent = doc.category || '';
 
         document.getElementById('panel-title').textContent = doc.title;

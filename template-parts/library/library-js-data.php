@@ -10,11 +10,11 @@ if ( $docs_query->have_posts() ) {
         $archivo_obj    = get_field( 'documento_archivo_actual', $id );
         $url_actual_raw = is_array( $archivo_obj ) ? ( $archivo_obj['url'] ?? '' ) : ( $archivo_obj ?: '' );
         $url_actual     = wp_http_validate_url( $url_actual_raw ) ? $url_actual_raw : '';
- 
+
         $version_actual = [
-            'numero' => sanitize_text_field( get_field( 'documento_numero_version', $id ) ?: 'v1.0.0' ),
+            'numero' => sanitize_text_field( get_field( 'documento_notas', $id ) ?: 'v1.0.0' ),
             'fecha'  => sanitize_text_field( get_the_date( 'd/m/Y', $id ) ),
-            'notas'  => wp_kses_post( get_field( 'documento_notas_version', $id ) ?: '' ),
+            'notas'  => wp_kses_post( get_field( 'documento_notas', $id ) ?: '' ),
             'url'    => $url_actual,
         ];
 
@@ -28,29 +28,31 @@ if ( $docs_query->have_posts() ) {
                 'value' => $id,
             ] ],
         ] );
- 
+
         $history_js = [];
         foreach ( $versiones_vinculadas as $v ) {
             $v_archivo_obj = get_field( 'documento_archivo_actual', $v->ID );
             $v_url_raw     = is_array( $v_archivo_obj ) ? ( $v_archivo_obj['url'] ?? '' ) : ( $v_archivo_obj ?: '' );
             $v_url         = wp_http_validate_url( $v_url_raw ) ? $v_url_raw : '';
- 
+
             $history_js[] = [
-                'numero' => sanitize_text_field( get_field( 'documento_numero_version', $v->ID ) ?: 'v1.0.0' ),
+                'id'    => $v->ID,
+                'title' => sanitize_text_field( get_the_title( $v->ID ) ),
+                'numero' => sanitize_text_field( get_field( 'documento_notas', $v->ID ) ?: 'v1.0.0' ),
                 'fecha'  => sanitize_text_field( get_the_date( 'd/m/Y', $v->ID ) ),
-                'notas'  => wp_kses_post( get_field( 'documento_notas_version', $v->ID ) ?: '' ),
+                'notas'  => wp_kses_post( get_field( 'documento_notas', $v->ID ) ?: '' ),
                 'url'    => $v_url,
             ];
         }
 
         $todas_las_versiones = array_merge( $history_js, [ $version_actual ] );
- 
+
         // ── Categoria
         $cats_post = get_the_terms( $id, 'categoria_documento' );
         $cat_name  = ( ! empty( $cats_post ) && ! is_wp_error( $cats_post ) )
             ? sanitize_text_field( $cats_post[0]->name )
             : '';
- 
+
         $docs_js[] = [
             'id'       => $id,
             'title'    => sanitize_text_field( get_the_title( $id ) ),
@@ -61,17 +63,18 @@ if ( $docs_query->have_posts() ) {
     }
     wp_reset_postdata();
 }
- 
+
 $flags = JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP;
 ?>
 <script>
 window.BIBLIOTECA_DOCS        = <?php echo wp_json_encode( $docs_js, $flags ); ?>;
 window.BIBLIOTECA_AJAX_URL    = "<?php echo esc_js( admin_url( 'admin-ajax.php' ) ); ?>";
-window.BIBLIOTECA_NONCE       = "<?php echo esc_js( wp_create_nonce( 'load_more_docs_nonce' ) ); ?>";
+window.BIBLIOTECA_NONCE       = "<?php echo esc_js( wp_create_nonce( 'filter_library_nonce' ) ); ?>";
 window.BIBLIOTECA_CURRENT_PAGE = <?php echo intval( $paged ); ?>;
 window.BIBLIOTECA_MAX_PAGES   = <?php echo intval( $docs_query->max_num_pages ); ?>;
-window.BIBLIOTECA_CAT_FILTER  = "<?php echo esc_js( $cat_filter ); ?>";
-window.BIBLIOTECA_YEAR_FILTER = <?php echo intval( $year_filter ); ?>;
+window.BIBLIOTECA_CATEGORIES  = <?php echo wp_json_encode( array_map( function($cat) { return $cat->slug; }, $categorias ), $flags ); ?>;
+window.BIBLIOTECA_TYPES       = <?php echo wp_json_encode( $types_available, $flags ); ?>;
+window.BIBLIOTECA_YEARS       = <?php echo wp_json_encode( $years_available, $flags ); ?>;
 window.CAT_COLORES = {
     'Boletines':       'bg-blue-100 text-blue-700 border-blue-200',
     'Informes':        'bg-purple-100 text-purple-700 border-purple-200',

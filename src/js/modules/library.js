@@ -36,13 +36,136 @@ document.addEventListener('DOMContentLoaded', () => {
 
     searchInput?.addEventListener('input', (e) => {
         const q = e.target.value.toLowerCase().trim();
- 
-        document.querySelectorAll('#biblioteca-grid > div.group').forEach(card => {
-            const titleElement = card.querySelector('.js-search-title');
-            const title = titleElement ? titleElement.textContent.toLowerCase() : '';
-            card.style.display = title.includes(q) ? '' : 'none';
+        handleSearchInput();
+    });
+
+    const handleSearchInput = debounce(() => {
+        const filters = getCurrentFilters();
+        filterDocuments(filters);
+    }, 300);
+
+    // Filter checkboxes and radios
+    document.querySelectorAll('.filter-checkbox, .filter-radio').forEach(input => {
+        input.addEventListener('change', () => {
+            const filters = getCurrentFilters();
+            filterDocuments(filters);
         });
     });
+
+    // Year filter apply button
+    document.getElementById('apply-year-filter')?.addEventListener('click', () => {
+        const filters = getCurrentFilters();
+        filterDocuments(filters);
+    });
+
+    // Clear buttons
+    document.getElementById('clear-categories')?.addEventListener('click', () => {
+        document.querySelectorAll('.filter-checkbox').forEach(cb => cb.checked = false);
+        const filters = getCurrentFilters();
+        filterDocuments(filters);
+    });
+
+    document.getElementById('clear-type')?.addEventListener('click', () => {
+        document.querySelectorAll('.filter-radio[name="tipo"]').forEach(rb => rb.checked = rb.value === '');
+        const filters = getCurrentFilters();
+        filterDocuments(filters);
+    });
+
+    document.getElementById('clear-years')?.addEventListener('click', () => {
+        document.getElementById('year-from').value = '';
+        document.getElementById('year-to').value = '';
+        const filters = getCurrentFilters();
+        filterDocuments(filters);
+    });
+
+    function getCurrentFilters() {
+        const categories = Array.from(document.querySelectorAll('.filter-checkbox:checked')).map(cb => cb.value);
+        const type = document.querySelector('.filter-radio[name="tipo"]:checked')?.value || '';
+        const yearFrom = document.getElementById('year-from')?.value || '';
+        const yearTo = document.getElementById('year-to')?.value || '';
+        const busqueda = document.getElementById('biblioteca-search')?.value || '';
+
+        return {
+            categoria: categories,
+            tipo: type,
+            anio_desde: yearFrom,
+            anio_hasta: yearTo,
+            busqueda: busqueda
+        };
+    }
+
+    function debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    }
+
+    function filterDocuments(filters) {
+        const formData = new FormData();
+        formData.append('action', 'filter_library');
+        formData.append('nonce', window.BIBLIOTECA_NONCE);
+
+        Object.keys(filters).forEach(key => {
+            if (Array.isArray(filters[key])) {
+                filters[key].forEach(value => formData.append(key + '[]', value));
+            } else {
+                formData.append(key, filters[key]);
+            }
+        });
+
+        fetch(window.BIBLIOTECA_AJAX_URL, {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                updateDocumentGrid(data.data.html);
+                updatePagination(data.data.pagination);
+                // Update global DOCS for modal
+                window.BIBLIOTECA_DOCS = data.data.docs;
+            }
+        })
+        .catch(error => console.error('Error filtering documents:', error));
+    }
+
+    function updateDocumentGrid(html) {
+        const grid = document.getElementById('biblioteca-grid');
+        if (grid) {
+            grid.innerHTML = html;
+        }
+    }
+
+    function updatePagination(paginationHtml) {
+        // Assuming pagination is after the grid
+        const grid = document.getElementById('biblioteca-grid');
+        if (grid && grid.nextElementSibling) {
+            grid.nextElementSibling.outerHTML = paginationHtml;
+            // Re-attach pagination listeners
+            attachPaginationListeners();
+        }
+    }
+
+    function attachPaginationListeners() {
+        document.querySelectorAll('.pagination-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const page = link.getAttribute('data-page');
+                const filters = getCurrentFilters();
+                filters.page = page;
+                filterDocuments(filters);
+            });
+        });
+    }
+
+    // Attach initial pagination listeners
+    attachPaginationListeners();
 
     // ── Abrir panel ──────────────────────────────────────
     window.openDocPanel = (id) => {
@@ -90,16 +213,21 @@ document.addEventListener('DOMContentLoaded', () => {
             history.forEach(v => {
                 // Contenedor principal
                 const row = el('div', 'bg-white p-4 flex gap-4 transition-colors');
- 
+
                 // ── Columna izquierda: versión + fecha ──────────────────────
                 const colLeft = el('div', 'flex flex-col content-center flex-shrink-0');
                 colLeft.appendChild(el('span', 'bg-gray-100 text-gray-700 text-center px-2 py-1 font-bold text-sm', v.numero || ''));
                 colLeft.appendChild(el('p',    'text-xs text-gray-500 mb-1', v.fecha || ''));
                 row.appendChild(colLeft);
- 
-                // ── Columna central: notas ──────────────────────────────────
-                row.appendChild(el('p', 'flex-grow min-w-0 text-sm text-gray-700 line-clamp-3', v.notas || '-'));
- 
+
+                // ── Columna central: título + notas ──────────────────────────────────
+                const colCenter = el('div', 'flex-grow min-w-0');
+                if (v.title) {
+                    colCenter.appendChild(el('h4', 'text-sm font-semibold text-gray-900 mb-1', v.title));
+                }
+                colCenter.appendChild(el('p', 'text-sm text-gray-700 line-clamp-3', v.notas || '-'));
+                row.appendChild(colCenter);
+
                 // ── Columna derecha: botón de descarga (sólo si URL válida) ─
                 const url = safeUrl(v.url);
                 if (url) {
@@ -128,7 +256,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     colRight.appendChild(a);
                     row.appendChild(colRight);
                 }
- 
+
                 histEl.appendChild(row);
             });
         }

@@ -373,3 +373,274 @@ add_action( 'customize_register', 'oficina_customize_register' );
 function oficina_sanitize_checkbox( $checked ) {
     return ( ( isset( $checked ) && true == $checked ) ? true : false );
 }
+
+// =============================================
+// AJAX Handler for Library Filtering
+// =============================================
+function filter_library_ajax_handler() {
+    check_ajax_referer('filter_library_nonce', 'nonce');
+
+    // Get filter parameters
+    $cat_filter = isset($_POST['categoria']) ? array_map('sanitize_text_field', (array)$_POST['categoria']) : [];
+    $year_from = isset($_POST['anio_desde']) ? intval($_POST['anio_desde']) : null;
+    $year_to = isset($_POST['anio_hasta']) ? intval($_POST['anio_hasta']) : null;
+    $search_term = isset($_POST['busqueda']) ? sanitize_text_field($_POST['busqueda']) : '';
+    $type_filter = isset($_POST['tipo']) ? sanitize_text_field($_POST['tipo']) : '';
+    $paged = isset($_POST['page']) ? intval($_POST['page']) : 1;
+
+    require_once get_template_directory() . '/template-parts/library/library-criteria.php';
+
+    // Build criteria
+    $builder = new CriteriaBuilder();
+
+    if (!empty($cat_filter)) {
+        $builder->addCriteria(new CategoryCriteria($cat_filter));
+    }
+
+    if ($year_from || $year_to) {
+        $builder->addCriteria(new DateRangeCriteria($year_from, $year_to));
+    }
+
+    if (!empty($search_term)) {
+        $builder->addCriteria(new TitleSearchCriteria($search_term));
+    }
+
+    if (!empty($type_filter)) {
+        $builder->addCriteria(new TypeCriteria($type_filter));
+    }
+
+    $query_args = $builder->build();
+    $query_args['paged'] = $paged;
+
+    $docs_query = new WP_Query($query_args);
+
+    // Generate HTML for grid
+    ob_start();
+    if ($docs_query->have_posts()) {
+        while ($docs_query->have_posts()) {
+            $docs_query->the_post();
+            $id = get_the_ID();
+            $imagen = get_the_post_thumbnail_url($id, 'medium');
+            $cats_post = get_the_terms($id, 'categoria_documento');
+            $cat_name = (!empty($cats_post) && !is_wp_error($cats_post)) ? $cats_post[0]->name : '';
+
+            $archivo_obj = get_field('documento_archivo_actual', $id);
+            $url_actual_raw = is_array($archivo_obj) ? ($archivo_obj['url'] ?? '') : ($archivo_obj ?: '');
+            $url_actual = wp_http_validate_url($url_actual_raw) ? $url_actual_raw : '#';
+
+            $version_numero = get_field('documento_numero_version', $id) ?: 'v1.0.0';
+            $autor = get_field('documento_autor', $id) ?: '';
+            $tipo = strtoupper(get_field('documento_tipo', $id) ?: '');
+            $anio = get_the_date('Y', $id);
+
+            $args_historial = [
+                'post_type' => 'documento',
+                'posts_per_page' => -1,
+                'meta_query' => [
+                    [
+                        'key' => 'documento_padre',
+                        'value' => $id,
+                    ]
+                ]
+            ];
+            $versiones_vinculadas = get_posts($args_historial);
+            $total_vers = count($versiones_vinculadas) + 1;
+            $tiene_hist = $total_vers > 1;
+            ?>
+            <div class="flex items-start gap-10 py-5 group hover:bg-gray-50/60 rounded-xl px-3 -mx-3 transition-colors relative">
+                <!-- Miniatura izquierda -->
+                <a href="<?php echo esc_url($url_actual); ?>" target="_blank" class="hidden sm:block flex-shrink-0 w-20 h-20 rounded-xs overflow-hidden bg-gray-100 border border-gray-200 hover:opacity-90 transition-opacity flex items-center justify-center">
+                    <?php if ($imagen) : ?>
+                    <img
+                        src="<?php echo esc_url($imagen); ?>"
+                        alt="<?php echo esc_attr(get_the_title()); ?>"
+                        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                    <?php else : ?>
+                    <div class="w-full h-full flex items-center justify-center">
+                        <svg class="w-8 h-8 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                    </div>
+                    <?php endif; ?>
+                </a>
+
+                <!-- Contenido derecha -->
+                <div class="flex-grow min-w-0">
+
+                    <!-- Breadcrumb -->
+                    <div class="flex items-center gap-1.5 text-xs text-gray-500 mb-1 flex-wrap">
+                        <span class="text-green-700 font-medium">biblioteca</span>
+                        <?php if ($cat_name) : ?>
+                        <span>›</span>
+                        <span><?php echo esc_html($cat_name); ?></span>
+                        <?php endif; ?>
+                        <?php if ($anio) : ?>
+                        <span>›</span>
+                        <span><?php echo esc_html($anio); ?></span>
+                        <?php endif; ?>
+                    </div>
+
+                    <!-- Título estilo resultado de búsqueda -->
+                    <a href="<?php echo esc_url($url_actual); ?>" target="_blank" rel="noopener noreferrer" class="block w-fit">
+                        <h4 class="js-search-title text-lg font-medium text-blue-700 hover:underline leading-snug mb-1 line-clamp-3">
+                            <?php the_title(); ?>
+                        </h4>
+                    </a>
+
+                    <!-- Meta info -->
+                    <div class="inline-flex items-center gap-2 flex-wrap mb-1.5 cursor-pointer hover:scale-[1.02] transition-transform origin-left" 
+                    onclick="openDocPanel(<?php echo intval($id); ?>)"
+                    title="Ver historial de versiones"
+                    role="button"
+                    tabindex="0"
+                    onkeydown="if(event.key==='Enter'||event.key===' ')openDocPanel(<?php echo intval($id); ?>)">
+                        <?php if ($tipo) : ?>
+                        <span class="text-xs font-bold px-1.5 py-0.5 rounded-xs bg-gray-100 text-gray-600 border border-gray-200">
+                            <?php echo esc_html($tipo); ?>
+                        </span>
+                        <?php endif; ?>
+                        <?php if ($version_numero) : ?>
+                        <span class="text-xs font-semibold px-1.5 py-0.5 rounded-xs <?php echo $tiene_hist ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600'; ?>">
+                            <?php echo esc_html($version_numero); ?>
+                        </span>
+                        <?php endif; ?>
+                        <?php if ($tiene_hist) : ?>
+                        <span class="text-xs text-blue-500">
+                            <?php echo $total_vers; ?> Documentos vinculados
+                        </span>
+                        <?php endif; ?>
+                    </div>
+
+                    <!-- Descripción -->
+                    <p class="text-sm text-gray-600 line-clamp-2 leading-relaxed">
+                        <?php if ($autor) echo esc_html($autor) . ' · '; ?>
+                        <?php echo esc_html(wp_trim_words(get_the_excerpt() ?: get_post_field('post_content', $id), 18, '...')); ?>
+                    </p>
+                </div>
+            </div>
+            <?php
+        }
+        wp_reset_postdata();
+    } else {
+        ?>
+        <div class="text-center py-20">
+            <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            <p class="text-gray-500 text-lg">No hay documentos disponibles.</p>
+        </div>
+        <?php
+    }
+    $grid_html = ob_get_clean();
+
+    // Generate pagination HTML
+    ob_start();
+    $total_pages = $docs_query->max_num_pages;
+    if ($total_pages > 1) :
+    ?>
+    <div class="flex justify-center items-center space-x-2">
+        <?php if ($paged > 1) : ?>
+        <a href="#" data-page="<?php echo $paged - 1; ?>" class="pagination-link inline-flex items-center justify-center w-5 h-5 rounded-xs text-gray-500 hover:bg-white hover:text-gray-700 transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+        </a>
+        <?php endif; ?>
+        <?php for ($i = 1; $i <= $total_pages; $i++) : ?>
+            <?php if ($i === $paged) : ?>
+            <span class="inline-flex items-center justify-center w-10 h-10 rounded-xs bg-blue-600 text-white font-medium shadow-sm">
+                <?php echo intval($i); ?>
+            </span>
+            <?php elseif ($i === 1 || $i === $total_pages || abs($i - $paged) <= 1) : ?>
+            <a href="#" data-page="<?php echo $i; ?>" class="pagination-link inline-flex items-center justify-center w-10 h-10 rounded-xs border border-gray-300 bg-white text-gray-700 hover:text-blue-600 transition-colors shadow-sm font-medium">
+                <?php echo intval($i); ?>
+            </a>
+            <?php elseif (abs($i - $paged) === 2) : ?>
+            <span class="inline-flex items-center justify-center w-10 h-10 text-gray-500">...</span>
+            <?php endif; ?>
+        <?php endfor; ?>
+        <?php if ($paged < $total_pages) : ?>
+        <a href="#" data-page="<?php echo $paged + 1; ?>" class="pagination-link inline-flex items-center justify-center w-5 h-5 rounded-xs text-gray-500 hover:bg-white hover:text-gray-700 transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+        </a>
+        <?php endif; ?>
+    </div>
+    <?php endif;
+    $pagination_html = ob_get_clean();
+
+    // Build docs array for JS
+    if ($docs_query->have_posts()) {
+        $temp_query = clone $docs_query;
+        $temp_query->rewind_posts();
+        
+        while ($temp_query->have_posts()) {
+            $temp_query->the_post();
+            $id = get_the_ID();
+
+            // 1. Obtener datos de la versión actual
+            $archivo_obj    = get_field('documento_archivo_actual', $id);
+            $url_actual_raw = is_array($archivo_obj) ? ($archivo_obj['url'] ?? '') : ($archivo_obj ?: '');
+            $url_actual     = wp_http_validate_url($url_actual_raw) ? $url_actual_raw : '';
+
+            $version_actual = [
+                'numero' => sanitize_text_field(get_field('documento_numero_version', $id) ?: 'v1.0.0'),
+                'fecha'  => sanitize_text_field(get_the_date('d/m/Y', $id)),
+                'notas'  => wp_kses_post(get_field('documento_notas', $id) ?: ''),
+                'url'    => $url_actual,
+            ];
+
+            // 2. Buscar versiones vinculadas (Opción B)
+            $versiones_vinculadas = get_posts([
+                'post_type'      => 'documento',
+                'posts_per_page' => -1,
+                'orderby'        => 'date',
+                'order'          => 'ASC',
+                'meta_query'     => [[
+                    'key'   => 'documento_padre',
+                    'value' => $id,
+                ]],
+            ]);
+
+            $history_js = [];
+            foreach ($versiones_vinculadas as $v) {
+                $v_archivo_obj = get_field('documento_archivo_actual', $v->ID);
+                $v_url_raw     = is_array($v_archivo_obj) ? ($v_archivo_obj['url'] ?? '') : ($v_archivo_obj ?: '');
+                $v_url         = wp_http_validate_url($v_url_raw) ? $v_url_raw : '';
+
+                $history_js[] = [
+                    'id'     => $v->ID,
+                    'title'  => sanitize_text_field(get_the_title($v->ID)),
+                    'numero' => sanitize_text_field(get_field('documento_numero_version', $v->ID) ?: 'v1.0.0'),
+                    'fecha'  => sanitize_text_field(get_the_date('d/m/Y', $v->ID)),
+                    'notas'  => wp_kses_post(get_field('documento_notas', $v->ID) ?: ''),
+                    'url'    => $v_url,
+                ];
+            }
+
+            // 3. Unir historial con la versión actual
+            $todas_las_versiones = array_merge($history_js, [$version_actual]);
+
+            // 4. Obtener categoría
+            $cats_post = get_the_terms($id, 'categoria_documento');
+            $cat_name  = (!empty($cats_post) && !is_wp_error($cats_post)) ? sanitize_text_field($cats_post[0]->name) : '';
+
+            // 5. Ensamblar array final para JS
+            $docs_js[] = [
+                'id'       => $id,
+                'title'    => sanitize_text_field(get_the_title($id)),
+                'year'     => sanitize_text_field(get_the_date('Y', $id)),
+                'category' => $cat_name,
+                'versions' => $todas_las_versiones,
+            ];
+        }
+        wp_reset_postdata();
+        $docs_query->rewind_posts();
+    }
+
+    wp_send_json_success([
+        'html' => $grid_html,
+        'pagination' => $pagination_html,
+        'docs' => $docs_js,
+    ]);
+}
+add_action('wp_ajax_filter_library', 'filter_library_ajax_handler');
+add_action('wp_ajax_nopriv_filter_library', 'filter_library_ajax_handler');

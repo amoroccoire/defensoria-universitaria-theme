@@ -2,11 +2,10 @@
 /**
  * Template Part: Biblioteca Virtual
  * CPT: documento | Taxonomía: categoria_documento
- * SCF Repeater: documento_versiones (version_numero, version_fecha, version_notas, version_archivo)
  */
 
 // Include queries
-include get_template_directory() . '/template-parts/library/library-queries.php';
+require_once get_template_directory() . '/template-parts/library/library-queries.php';
 ?>
 
 <section id="biblioteca" class="py-20 bg-gray-50">

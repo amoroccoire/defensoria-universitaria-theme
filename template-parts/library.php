@@ -13,7 +13,7 @@ $section_biblioteca   = get_field('section_description') ?: 'Documentos, reglame
 <section id="biblioteca" class="py-20 bg-gray-50">
     <div class="container mx-auto px-4 max-w-7xl">
 
-        <h2 class="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-4">
+        <h2 class="text-3xl md:text-4xl font-bold text-center text-gray-900 mt-10 mb-4">
             <?php echo esc_html($titulo_bilioteca); ?>
         </h2>
         <p class="text-center text-gray-500 mb-12">
